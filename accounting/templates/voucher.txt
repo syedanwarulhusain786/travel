@@ -1,0 +1,12 @@
+
+Purchase
+Sell
+Reciept
+payment
+Journal Entry
+
+
+Sales -Credit
+Purchase - Debit
+Expenses- Debit
+if bal is negative it shoul dreflesgh in credit
