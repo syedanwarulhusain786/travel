@@ -27,6 +27,8 @@ urlpatterns = [
     path('action/', views.action, name="action"),
     path('submit_journal/', views.submit_journal, name="submit_journal"),
     path('journalEntries/', views.journalEntries, name="journalEntries"),
+    path('maintain/', views.maintain, name="maintain"),
+    
     
     
     

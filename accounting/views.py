@@ -340,3 +340,14 @@ def Balance_sheet(request):
     return render(request, 'home.html', context={
         'username':request.user
     })
+    
+    
+    
+def maintain(request):
+                
+    print(request.user.username)    
+               
+
+    return render(request, 'maintain.html', context={
+        'username':request.user
+    })

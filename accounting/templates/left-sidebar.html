@@ -63,74 +63,173 @@
                   
                 
 
-
+                
+                
+                  
                     <li  class="has-sub" >
                       <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#buttons"
                         aria-expanded="false" aria-controls="buttons">
-                        <span class="nav-text">Journal Entries</span> <b class="caret"></b>
+                        <span class="nav-text">Voucher Entries</span> <b class="caret"></b>
                       </a>
                       <ul  class="collapse"  id="buttons">
                         <div class="sub-menu">
                           
-                          <li >
-                            <a href="{% url 'journalEntry' %}">Journal Entry</a>
-                          </li>
-                          <li >
-                            <a href="{% url 'journalEntries' %}">Journal Entries</a>
-                          </li
-                          
-                          
+                        <li>
+                          <a href="{% url 'journalEntry' %}">Voucher Entry</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'journalEntries' %}">Payment Voucher</a>
+                        </li>  
+                        <li>
+                            <a href="{% url 'maintain' %}">Reciept Voucher</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'maintain' %}">Sales Voucher</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">Purchase Entries</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">Voucher Entries</a>
+                        </li>
                           
                         </div>
                       </ul>
                     </li>
-                            
+                    <li  class="has-sub" >
+                      <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#buttons1"
+                        aria-expanded="false" aria-controls="buttons1">
+                        <span class="nav-text">SALES ORDER</span> <b class="caret"></b>
+                      </a>
+                      <ul  class="collapse"  id="buttons1">
+                        <div class="sub-menu">
                           
-  
+                        <li>
+                          <a href="{% url 'maintain' %}">SALES-ORDER VOUCHER</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">SALES-ORDER VOUCHER LIST</a>
+                        </li>  
+                        <li>
+                            <a href="{% url 'maintain' %}">SALES VOUCHER</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'maintain' %}">SALES VOUCHER LIST</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">SALES-RETURN VOUCHER</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">SALES-RETURN VOUCHER LIST</a>
+                        </li>
                           
-                          
-                            
-      
-                            
+                        </div>
+                      </ul>
+                    </li>
                 
-                  
+
+                
+                
+        
+
+                    <li  class="has-sub" >
+                      <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#buttons2"
+                        aria-expanded="false" aria-controls="buttons2">
+                        <span class="nav-text">RECEIPT</span> <b class="caret"></b>
+                      </a>
+                      <ul  class="collapse"  id="buttons2">
+                        <div class="sub-menu">
+                          
+                        <li>
+                          <a href="{% url 'maintain' %}">RECEIPT VOUCHER</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">RECEIPT LIST</a>
+                        </li>  
+                        </div>
+                      </ul>
+                    </li>
+                
+                    <li  class="has-sub" >
+                      <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#buttons3"
+                        aria-expanded="false" aria-controls="buttons3">
+                        <span class="nav-text">PAYMENT</span> <b class="caret"></b>
+                      </a>
+                      <ul  class="collapse"  id="buttons3">
+                        <div class="sub-menu">
+                          
+                        <li>
+                          <a href="{% url 'maintain' %}">PAYMENT VOUCHER</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">PAYMENT LIST</a>
+                        </li>  
+                        </div>
+                      </ul>
+                    </li>
+                
+                    <li  class="has-sub" >
+                      <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#buttons4"
+                        aria-expanded="false" aria-controls="buttons4">
+                        <span class="nav-text">BANKING REPORT</span> <b class="caret"></b>
+                      </a>
+                      <ul  class="collapse"  id="buttons4">
+                        <div class="sub-menu">
+                          
+                        <li>
+                          <a href="{% url 'maintain' %}">BANKING BALANCE REPORT</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">BANK RECONCILIATION</a>
+                        </li>  
+                        <li>
+                          <a href="{% url 'maintain' %}">BANK CHEQUE REGISTER</a>
+                        </li> 
+                        </div>
+                      </ul>
+                    </li>
                     
-                  
-                
-
-                
-                
-                  
-                    <li >
-                      <a class="sidenav-item-link" href="{% url 'generalLedger' %}">
-                        <span class="nav-text">Ledgers</span>
-                        
+                    <li  class="has-sub" >
+                      <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#buttons5"
+                        aria-expanded="false" aria-controls="buttons5">
+                        <span class="nav-text">Account REPORT</span> <b class="caret"></b>
                       </a>
+                      <ul  class="collapse"  id="buttons5">
+                        <div class="sub-menu">
+                          
+                        <li>
+                          <a href="{% url 'journalEntry' %}">BANK BALANCE REPORT</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'maintain' %}">CASH</a>
+                        </li>  
+                        <li>
+                          <a href="{% url 'maintain' %}">SALESMAN WISE REPORT</a>
+                        </li> 
+                        <li>
+                          <a href="{% url 'maintain' %}">OUTSTANDING RECEIVABLES REPORT</a>
+                        </li> 
+                        <li>
+                          <a href="{% url 'maintain' %}">PAYABLES REPORT</a>
+                        </li> 
+                        <li>
+                          <a href="{% url 'maintain' %}">VAT REPORT</a>
+                        </li> 
+                        <li>
+                          <a href="{% url 'maintain' %}">TRIAL BALANCE REPORT</a>
+                        </li> 
+                        <li>
+                          <a href="{% url 'maintain' %}">TRADING AND PROFIT LOSS REPORT</a>
+                        </li> 
+                        <li>
+                          <a href="{% url 'maintain' %}">PROFIT AND LOSS REPORT</a>
+                        </li> 
+                        <li>
+                          <a href="{% url 'maintain' %}">BALANCE SHEET REPORT</a>
+                        </li> 
+                        </div>
+                      </ul>
                     </li>
-                  
-                    <li >
-                      <a class="sidenav-item-link" href="{% url 'trialBalance' %}">
-                        <span class="nav-text">Trial Balance</span>
-                        
-                      </a>
-                    </li>
-                    <li >
-                      <a class="sidenav-item-link" href="{% url 'profitAndLoss' %}">
-                        <span class="nav-text">Profit and Loss Account</span>
-                        
-                      </a>
-                    </li>
-                    <li >
-                      <a class="sidenav-item-link" href="{% url 'balanceSheet' %}">
-                        <span class="nav-text">Balance Sheet</span>
-                        
-                      </a>
-                    </li>
-                  
-                
-
-                
-
                 
             </div>
             </ul>
