@@ -30,6 +30,16 @@ urlpatterns = [
     path('maintain/', views.maintain, name="maintain"),
     
     
+    path('paymentEntry/', views.paymentEntry, name="paymentEntry"),
+    
+    path('paymentList/', views.paymentList, name="paymentList"),
+    
+    path('recieptList/', views.recieptList, name="recieptList"),
+    
+    path('recieptEntry/', views.recieptEntry, name="recieptEntry"),
+    
+    
+    
     
     
     

@@ -40,7 +40,7 @@
         <div class="card-header text-center">
             <span class="mdi-format-float-left"></span>
             
-            <h4>Add Journal Entry
+            <h4>Add Payment Entry
             </h4>
             <!-- Expand Left -->
         </div>
@@ -71,19 +71,8 @@
                     ">
                             <label class="col-form-label" for="voucher_no">Invoice Voucher No &emsp;</label>
                             <input type="text" class="form-control col-6" id="invoice_no"  value="">
-                            
                         </div>
-                        
                     </div>
-                    <div class="form-group text-center">
-                    <div class="row" style="margin-left: 155px;">
-                        <label for="journal_date"> Invoice Date <span class="text-danger">*&emsp;</span></label>
-                        <input type="date" class="form-control col-6" id="journal_date" required>
-                    </div>
-                    </div>
-
-
-
                     <div class="form-group text-center">
                         <div class="row" style="
                         margin-left: 252px;
@@ -95,11 +84,7 @@
                         </div>
                     </div>
             </div>
-            <div class="form-group text-center my-5">
-                <div class="col-md-12 text-right"> <!-- Add Bootstrap grid classes -->
-                    <button type="button" class="btn btn-danger" id="addRowButton">Add Row</button>
-                </div>
-            </div>
+
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered" id="transactionTable">
@@ -138,47 +123,8 @@
                                 <td><input type="number" class="form-control" step="0.01" id="cre1"></td>
                                 <td></td>
                             </tr>
-                            <tr>
-                                <td>
-                                    <select class="form-control" id="dropdown2">
-                                        {% for account in account_list %}
-                                    <option data-value="{{ account.subcategory.category.category_name }}" data-tokens="{{ account.subcategory }}" id="{{ account.account_number.subcategory_name }}" value="{{ account.account_number }}">{{ account.account_name }}</option>
-                        
-                                        
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="text" id="cat2" disabled>
-                            
-                                </td>
-                                <td>
-                                    <input type="text" id="sub2" disabled>
-                                </td>
-                                <td><input type="text" class="form-control" id="nar2"></td>
-                                <td><input type="number" class="form-control" step="0.01"id="deb2"></td>
+      
 
-                                <td><input type="number" class="form-control" step="0.01" id="cre2"></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    
-                                </td>
-                                <td>
-                                    
-                            
-                                </td>
-                                <td>
-                                    
-                                </td>
-                                <td><span><b>Total:</b></span></td>
-                                <td><input type="number" class="form-control" step="0.01"id="d_total" disabled></td>
-
-                                <td><input type="number" class="form-control" step="0.01" id="c_total" disabled></td>
-                                <td></td>
-                            </tr>
-                            
                         </tbody>
                     </table>
                 </div>

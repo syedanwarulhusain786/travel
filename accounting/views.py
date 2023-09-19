@@ -65,9 +65,9 @@ def get_next_voucher_number(request):
     
     try:
         last_account = JournalEntries.objects.latest('voucherNo')
-        next_account_number = 'VN-{}'.format(str(int(last_account.voucherNo) + 1))
+        next_account_number = 'JV-{}'.format(str(int(last_account.voucherNo) + 1))
     except JournalEntries.DoesNotExist:
-        next_account_number = 'VN-'+str(100)  # Initial account number
+        next_account_number = 'JV-'+str(100)  # Initial account number
 
     return JsonResponse({'success': True, 'voucher_numbe': next_account_number})    
 def action(request):
@@ -118,7 +118,7 @@ def submit_journal(request):
         narration = data.get(f'notes', '')  # Replace 'nar' with the actual key in your QueryDict
         
         # Loop through the data to create and save JournalEntries instances
-        for i in range(1, 5):  # Assuming you have four sets of data (1 to 4)
+        for i in range(1, 10):  # Assuming you have four sets of data (1 to 4)
             # Replace 'voucher' with the actual key in your QueryDict
             # narration = data.get(f'nar{i}', '')  # Replace 'nar' with the actual key in your QueryDict
             category_name = data.get(f'cat{i}', '')
@@ -273,7 +273,36 @@ def Gernal_Ledger(request):
     }) 
     
   
-  
+
+def paymentEntry(request):
+    print(request.user.username)    
+               
+
+    return render(request, 'paymentVoucher.html', context={
+        'username':request.user
+    })
+def paymentList(request):
+    print(request.user.username)    
+               
+
+    return render(request, 'paymentList.html', context={
+        'username':request.user
+    })
+def recieptEntry(request):
+    print(request.user.username)    
+               
+
+    return render(request, 'recieptVoucher.html', context={
+        'username':request.user
+    })  
+def recieptList(request):
+    print(request.user.username)    
+               
+
+    return render(request, 'recieptList.html', context={
+        'username':request.user
+    })
+
   
   
   
