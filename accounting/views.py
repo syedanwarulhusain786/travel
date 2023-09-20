@@ -41,13 +41,12 @@ from datetime import datetime
 def autocomplete(request):
     term = request.GET.get('term', '')
     # Implement your logic to fetch suggestions based on the input term
-    suggestions = IndividualAccount.objects.filter(accountname__icontains=term).values_list('accountname', flat=True)
+    suggestions = Ledger.objects.filter(ledger_name__icontains=term).values_list('ledger_name', flat=True)
     return JsonResponse(list(suggestions), safe=False)
 def Account_chart(request):
-    Category_list=Subcategory.objects.all()
+    Category_list=Group.objects.all()
     # category_data = serializers.serialize('json', Category_list)
-    accounts = IndividualAccount.objects.all()
-    print(accounts,'reload')           
+    accounts = Ledger.objects.all()
 
     return render(request, 'accountsCharts.html', context={
         'username':request.user,'IndividualAccount_list':accounts,'account_subcategory':Category_list
@@ -55,9 +54,9 @@ def Account_chart(request):
 def get_next_account_number(request):
 
     try:
-        last_account = IndividualAccount.objects.latest('account_number')
-        next_account_number = last_account.account_number + 1
-    except IndividualAccount.DoesNotExist:
+        last_account = Ledger.objects.latest('ledger_number')
+        next_account_number = last_account.ledger_number + 1
+    except Ledger.DoesNotExist:
         next_account_number = 1001  # Initial account number
 
     return JsonResponse({'success': True, 'account_number': next_account_number})
@@ -93,17 +92,17 @@ def action(request):
 
             # Delete the account using the account number
             try:
-                account_to_delete = IndividualAccount.objects.get(account_number=account_number)
+                account_to_delete = Ledger.objects.get(ledger_number=account_number)
                 account_to_delete.delete()
                 return JsonResponse({'success': True, 'message': 'Account deleted successfully'})
-            except IndividualAccount.DoesNotExist:
+            except Ledger.DoesNotExist:
                 return JsonResponse({'success': False, 'message': 'Account not found'})
         elif action == "save":
             # Handle edit action
             account_num = data.get("account_number")
             new_account_name = data.get("accountname").replace(' ','_')
-            category = Subcategory.objects.get(subcategory_number=account_num)
-            new_account = IndividualAccount(subcategory=category, account_name=new_account_name)
+            category = Group.objects.get(group_number=account_num)
+            new_account = Ledger(group=category, ledger_name=new_account_name)
 
         # Save the new Account object to the database
             new_account.save()
@@ -115,6 +114,10 @@ def submit_journal(request):
     try:
         data = request.POST # Replace with your actual QueryDict data
         voucher_no = data.get(f'voucher', '').split('-')[-1]
+        invoice_no = data.get(f'invoice_no', '').split('-')[-1]
+        invoice_date = data.get(f'invoice_date', '').split('-')[-1]
+        
+        
         narration = data.get(f'notes', '')  # Replace 'nar' with the actual key in your QueryDict
         
         # Loop through the data to create and save JournalEntries instances
@@ -132,32 +135,34 @@ def submit_journal(request):
             account_num=data.get(f'dropdown{i}', 0)  # Default to 0 if not present or invalid
             try:
                 # Fetch the corresponding Category, Subcategory, and IndividualAccount instances
-                category = Category.objects.get(category_name=category_name)
-                subcategory = Subcategory.objects.get(subcategory_name=subcategory_name.split('-')[-1])
-                account = IndividualAccount.objects.get(account_number=account_num)  # Replace with the appropriate field
+                category = Primary_Group.objects.get(primary_group_name=category_name)
+                subcategory = Group.objects.get(group_name=subcategory_name.split('-')[-1])
+                account = Ledger.objects.get(ledger_number=account_num)  # Replace with the appropriate field
             
                 # Create and save the JournalEntries instance
                 entry = JournalEntries(
                     voucherNo=voucher_no,
                     narration=narration,
-                    category=category,
-                    subcategory=subcategory,
-                    account=account,
+                    primary_group=category,
+                    group=subcategory,
+                    ledger=account,
                     debit=float(debit),
                     credit=float(credit),
+                    invoice_no=invoice_no,
+                    invoice_date=invoice_date
                       # You can set comments as needed
                 )
                 entry.save()
-            except Category.DoesNotExist:
+            except Primary_Group.DoesNotExist:
                 pass
-            except Subcategory.DoesNotExist:
+            except Group.DoesNotExist:
                 pass
-            except IndividualAccount.DoesNotExist:
+            except Ledger.DoesNotExist:
                 pass
         entry_response = {
                     "voucherNo": entry.voucherNo,
                     "voucherCode": entry.voucherCode,  # Assuming you have a 'voucherCode' field in your model
-                    "account": entry.account.account_name,  # Assuming 'account_name' is the relevant field in 'IndividualAccount'
+                    "account": entry.ledger.ledger_name,  # Assuming 'account_name' is the relevant field in 'IndividualAccount'
                 }
         print(entry_response)
 
@@ -185,9 +190,9 @@ def journalEntries(request):
         multiple_q = (
             Q(voucherNo__icontains=q) |
             Q(voucherCode__icontains=q) |
-            Q(category__category_name__icontains=q) |
-            Q(subcategory__subcategory_name__icontains=q) |
-            Q(account__account_name__icontains=q)
+            Q(primary_group__primary_group_name__icontains=q) |
+            Q(group__group_name__icontains=q) |
+            Q(ledger__ledger_name__icontains=q)
         )
 
         # Apply date range filtering if both 'from_date' and 'to_date' are provided
@@ -218,9 +223,9 @@ def journalEntries(request):
     return render(request, 'journalEntries.html',context=context )  
 def Journal_entry(request):
                 
-    Category_list=Category.objects.all()
-    Subcategory_list = Subcategory.objects.all()
-    accounts = IndividualAccount.objects.all()
+    Category_list=Primary_Group.objects.all()
+    Subcategory_list = Group.objects.all()
+    accounts = Ledger.objects.all()
                
 
     return render(request, 'journalEntry.html',  context={
@@ -228,7 +233,7 @@ def Journal_entry(request):
     })
 def Gernal_Ledger(request):
                 
-    accounts = IndividualAccount.objects.all()           
+    accounts = Ledger.objects.all()           
     q=request.GET.get('q')
     lis=[]
     result={}
@@ -244,7 +249,7 @@ def Gernal_Ledger(request):
             led={}
       
             led['date']=row.date
-            led['account']=row.account
+            led['ledger']=row.ledger
             led['narration']=row.narration
             led['debit']=row.debit
             led['credit']=row.credit
@@ -262,8 +267,8 @@ def Gernal_Ledger(request):
           'bal_result':bal,
         
         }
-        cat=row.category.category_name
-        subcat=row.subcategory.subcategory_name
+        cat=row.primary_group.primary_group_name
+        subcat=row.group.group_name
             
 
             
@@ -315,7 +320,7 @@ def recieptList(request):
     
 def Trial_Balance(request):
                 
-    accounts = IndividualAccount.objects.values('account_name',)  
+    accounts = Ledger.objects.values('ledger_name',)  
     led=[]
     res={}
     resdeb=0
@@ -323,7 +328,7 @@ def Trial_Balance(request):
     resbal=0
     
     for account in accounts:        
-        ledgers=JournalEntries.objects.filter(account__account_name=account['account_name'])
+        ledgers=JournalEntries.objects.filter(ledger__ledger_name=account['ledger_name'])
         print()
         cred=0
         deb=0
@@ -337,7 +342,7 @@ def Trial_Balance(request):
             deb=deb+row.debit
             bal=deb-cred
             
-        le={'type':account['account_name'],
+        le={'type':account['ledger_name'],
             'deb':deb,'cred':cred,'bal':bal
         }
         led.append(le)

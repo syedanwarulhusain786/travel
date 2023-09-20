@@ -35,14 +35,14 @@
                   <tr>
                     <th scope="col">S No</th>
 
-                    <th scope="col">voucherNo</th>
-                    <th scope="col">voucherCode</th>
+                    <th scope="col">VoucherNo</th>
+                    <th scope="col">VoucherCode</th>
                     <th scope="col">Date</th>
                     <th scope="col">Narration</th>
-                    <th scope="col">Account</th>
-                    <th scope="col">Subcategory</th>
+                    <th scope="col">Ledger</th>
+                    <th scope="col">Group</th>
 
-                    <th scope="col">Category</th>
+                    <th scope="col">Primary Group</th>
 
                     <th scope="col">Debit</th>
                     <th scope="col">Credit</th>
@@ -61,9 +61,9 @@
                     <td>{{journal.date}}</td>
                     <td>{{journal.narration}}</td>
                     <td>{{journal.account}}</td>
-                    <td>{{journal.subcategory.subcategory_name}}</td>
+                    <td>{{journal.subcategory.group_name}}</td>
 
-                    <td>{{journal.subcategory.category.category_name}}</td>
+                    <td>{{journal.subcategory.primary_group.primary_group_name}}</td>
 
                     <td>{{journal.debit}}</td>
                     <td>{{journal.credit}}</td>

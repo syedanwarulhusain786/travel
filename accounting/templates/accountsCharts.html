@@ -17,12 +17,12 @@
                       <thead>
                         <tr>
                           <th scope="col">#</th>
-                          <th scope="col">Account Category No</th>
-                          <th scope="col">Account Category</th>
-                          <th scope="col">Account Sub Category No</th>
-                          <th scope="col">Account Sub Category Name</th>
-                          <th scope="col">Individual Account Name</th>
-                          <th scope="col">Individual Account No</th>
+                          <th scope="col">Primary Group No</th>
+                          <th scope="col">Primary Group Name</th>
+                          <th scope="col">Group No</th>
+                          <th scope="col">Group Name</th>
+                          <th scope="col">Ledger Name</th>
+                          <th scope="col">Ledger No</th>
 
 
                           <th scope="col">Actions</th>
@@ -33,16 +33,16 @@
        
                         <tr>
                           <td scope="row">{{ forloop.counter }}</td>
-                          <td>{{ IndividualAccount.subcategory.category.category_number }}</td>
-                          <td>{{ IndividualAccount.subcategory.category.category_name }}</td>
-                          <td>{{ IndividualAccount.subcategory.subcategory_number }}</td>
-                          <td>{{ IndividualAccount.subcategory.subcategory_name}}</td>
-                          <td>{{ IndividualAccount.account_number }}</td>
-                          <td>{{ IndividualAccount.account_name }}</td>
+                          <td>{{ IndividualAccount.group.primary_group.primary_group_number }}</td>
+                          <td>{{ IndividualAccount.group.primary_group.primary_group_name }}</td>
+                          <td>{{ IndividualAccount.group.group_number }}</td>
+                          <td>{{ IndividualAccount.group.group_name}}</td>
+                          <td>{{ IndividualAccount.ledger_name }}</td>
+                          <td>{{ IndividualAccount.ledger_number }}</td>
 
                           <td>
                            
-                            <button type="button" class="btn btn-danger" onclick="DeleteAction('delete',{{ IndividualAccount.account_number }},'{{ IndividualAccount.account_name }}')">Delete</button>
+                            <button type="button" class="btn btn-danger" onclick="DeleteAction('delete',{{ IndividualAccount.ledger_number }},'{{ IndividualAccount.ledger_name }}')">Delete</button>
                           </td>
                         </tr>
                     {% endfor %}
@@ -79,7 +79,7 @@
                 <label for="account_category">Account Category:</label>
                 <select class="selectpicker" id="accountNumber" data-live-search="true">
                   {% for category in account_subcategory %}
-                  <option data-tokens="{{ category.subcategory_number }}" id="{{ category.subcategory_number }}" value="{{ category.subcategory_number }}">{{ category.subcategory_name }}</option>
+                  <option data-tokens="{{ category.group_number }}" id="{{ category.group_number }}" value="{{ category.group_number }}">{{ category.group_name }}</option>
        
                       
                     {% endfor %}

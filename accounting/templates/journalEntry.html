@@ -35,7 +35,7 @@
         <div class="content-wrapper">
           <div class="content">                
                   <!-- Top Statistics -->
-<div class="container mt-5 text-center" style="max-width:1450;">
+<div class="container mt-5 text-center" style="max-width:1920px;">
     <div class="card">
         <div class="card-header text-center">
             <span class="mdi-format-float-left"></span>
@@ -54,7 +54,7 @@
                         margin-left: 255px;
                     ">
                             <label for="journal_date">Date <span class="text-danger">*&emsp;</span></label>
-                            <input type="date" class="form-control col-6" id="journal_date" required>
+                            <input type="date" class="form-control col-5" id="journal_date" required>
                         </div>
                     </div>
                     <div class="form-group text-center">
@@ -62,24 +62,28 @@
                         margin-left: 155px;
                     ">
                             <label class="col-form-label" for="voucher_no">Journal Voucher No &emsp;</label>
-                            <input type="text" class="form-control col-6" id="voucher_no" readonly value="">
+                            <input type="text" class="form-control col-5" id="voucher_no" readonly value="">
                         </div>
                     </div>
                     <div class="form-group text-center">
                         <div class="row" style="
                         margin-left: 155px;
+                       
+
                     ">
                             <label class="col-form-label" for="voucher_no">Invoice Voucher No &emsp;</label>
-                            <input type="text" class="form-control col-6" id="invoice_no"  value="">
+                            <input type="text" class="form-control col-5" id="invoice_no"  value="">
                             
                         </div>
                         
                     </div>
                     <div class="form-group text-center">
-                    <div class="row" style="margin-left: 155px;">
-                        <label for="journal_date"> Invoice Date <span class="text-danger">*&emsp;</span></label>
-                        <input type="date" class="form-control col-6" id="journal_date" required>
-                    </div>
+                        <div class="row" style="margin-left: 155px; left: 40px;">
+                            <label for="journal_date"> Invoice Date <span class="text-danger">&emsp;</span></label>
+                            <input type="date" class="form-control col-5" id="invoice_date" style="
+                            left: 40px;
+                        ">
+                        </div>
                     </div>
 
 
@@ -106,8 +110,8 @@
                         <thead>
                             <tr>
                                 <th>Account</th>
-                                <th>Category</th>
-                                <th>Sub Category</th>
+                                <th>Primary Group</th>
+                                <th>Group</th>
                                 <th>Narration</th>
                                 <th>Debit</th>
                                 <th>Credit</th>
@@ -119,7 +123,7 @@
                                 <td>
                                     <select class="form-control" id="dropdown1">
                                         {% for account in account_list %}
-                                    <option data-value="{{ account.subcategory.category.category_name }}" data-tokens="{{ account.subcategory }}" id="{{ account.account_number.subcategory_name }}" value="{{ account.account_number }}">{{ account.account_name }}</option>
+                                    <option data-value="{{ account.group.primary_group.primary_group_name }}" data-tokens="{{ account.group }}" id="{{ account.ledger_number.subcategory_name }}" value="{{ account.ledger_number }}">{{ account.ledger_name }}</option>
                         
                                         
                                         {% endfor %}
@@ -142,7 +146,7 @@
                                 <td>
                                     <select class="form-control" id="dropdown2">
                                         {% for account in account_list %}
-                                    <option data-value="{{ account.subcategory.category.category_name }}" data-tokens="{{ account.subcategory }}" id="{{ account.account_number.subcategory_name }}" value="{{ account.account_number }}">{{ account.account_name }}</option>
+                                    <option data-value="{{ account.group.primary_group.primary_group_name }}" data-tokens="{{ account.group }}" id="{{ account.ledger_number.subcategory_name }}" value="{{ account.ledger_number }}">{{ account.ledger_name }}</option>
                         
                                         
                                         {% endfor %}
@@ -286,11 +290,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Update the IDs of the cloned elements to avoid duplicates
         const rowIndex = table.rows.length - 2; // Index of the new row (0-based)
+        console.log(rowIndex)
         const elementsToChange = newRow.querySelectorAll("[id]");
         elementsToChange.forEach(function (element) {
             const id = element.getAttribute("id");
             const idParts = id.split(/\d+/);
-            const num = rowIndex + 1; // Adding 1 to match the row number
+            const num = rowIndex ; // Adding 1 to match the row number
             element.setAttribute("id", idParts[0] + num);
             element.setAttribute("name", idParts[0] + num); // Also update the 'name' attribute if needed
             // element.value = ""; // Clear the input values in the new row
@@ -315,11 +320,18 @@ document.addEventListener("DOMContentLoaded", function() {
     submitButton.addEventListener("click", function() {
         // Create a FormData object
         const formData = new FormData();
-        const tableRows = form.querySelectorAll("tbody tr");
+        const tableRows = form.querySelectorAll("tbody tr:not(:last-child)");
         const voucher=document.getElementById("voucher_no").value;
+        const invoice_no=document.getElementById("invoice_no").value;
+        const invoice_date=document.getElementById("invoice_date").value;
+
         const notes=document.getElementById("notes").value;
         formData.append(`notes`, notes);
         formData.append(`voucher`, voucher);
+        formData.append(`invoice_no`, invoice_no);
+
+        formData.append(`invoice_date`, invoice_date);
+
         tableRows.forEach((row, index) => {
             const select = row.querySelector("select");
             
@@ -329,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const nar = row.querySelector(`#nar${index + 1}`);
             const cre = row.querySelector(`#cre${index + 1}`);
             const deb = row.querySelector(`#deb${index + 1}`);
-
+            console.log( index)
             // Append each field to the FormData object
             formData.append(`dropdown${index + 1}`, select.value);
             

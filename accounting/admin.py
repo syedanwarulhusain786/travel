@@ -1,104 +1,99 @@
 from django.contrib import admin
 from django import forms
-from .models import Category, Subcategory, IndividualAccount,JournalEntries
 import csv
 from django.http import HttpResponse
+from .models import Primary_Group, Group, Ledger, JournalEntries
 
 # Export selected objects as CSV
 def export_as_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="exported_data.csv"'
     writer = csv.writer(response)
-    writer.writerow(['Category Name', 'Subcategory Name', 'Account Name'])
+    writer.writerow(['Primary Group Name', 'Group Name', 'Ledger Name'])
     for obj in queryset:
-        writer.writerow([obj.subcategory.category.category_name,
-                         obj.subcategory.subcategory_name,
-                         obj.account_name])
+        writer.writerow([obj.group.primary_group.primary_group_name,
+                         obj.group.group_name,
+                         obj.ledger_name])
     return response
+
 export_as_csv.short_description = "Export selected objects as CSV"
 
-class CategoryAdminForm(forms.ModelForm):
+class PrimaryGroupAdminForm(forms.ModelForm):
     class Meta:
-        model = Category
-        exclude = ('category_number',)
+        model = Primary_Group
+        exclude = ('primary_group_number',)
 
-class SubcategoryAdminForm(forms.ModelForm):
+class GroupAdminForm(forms.ModelForm):
     class Meta:
-        model = Subcategory
-        exclude = ('subcategory_number',)
+        model = Group
+        exclude = ('group_number',)
 
-class IndividualAccountAdminForm(forms.ModelForm):
+class LedgerAdminForm(forms.ModelForm):
     class Meta:
-        model = IndividualAccount
-        exclude = ('account_number',)
-
+        model = Ledger
+        exclude = ('ledger_number',)
 
 class JournalEntriesAdminForm(forms.ModelForm):
     class Meta:
         model = JournalEntries
-        exclude = ('voucherNo','voucherCode',)
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    form = CategoryAdminForm
-    list_display = ('category_number', 'category_name')
-    search_fields = ('category_number', 'category_name')
+        exclude = ('voucherNo', 'voucherCode',)
 
-@admin.register(Subcategory)
-class SubcategoryAdmin(admin.ModelAdmin):
-    form = SubcategoryAdminForm
-    list_display = ('get_category_number', 'get_category_name', 'get_subcategory_number', 'get_subcategory_name', 'subcategory_number', 'subcategory_name')
-    search_fields = ('subcategory_number', 'subcategory_name')
-    list_filter = ('category',)
+@admin.register(Primary_Group)
+class PrimaryGroupAdmin(admin.ModelAdmin):
+    form = PrimaryGroupAdminForm
+    list_display = ('primary_group_number', 'primary_group_name', 'primary_group_type')
+    search_fields = ('primary_group_number', 'primary_group_name')
 
-    def get_category_number(self, obj):
-        return obj.category.category_number
-    get_category_number.short_description = 'Category Number'
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    form = GroupAdminForm
+    list_display = ('get_primary_group_number', 'get_primary_group_name', 'get_group_number', 'group_name')
+    search_fields = ('group_name',)
+    list_filter = ('primary_group',)
 
-    def get_category_name(self, obj):
-        return obj.category.category_name
-    get_category_name.short_description = 'Category Name'
+    def get_primary_group_number(self, obj):
+        return obj.primary_group.primary_group_number
+    get_primary_group_number.short_description = 'Primary Group Number'
 
-    def get_subcategory_number(self, obj):
-        return obj.subcategory_number
-    get_subcategory_number.short_description = 'Subcategory Number'
+    def get_primary_group_name(self, obj):
+        return obj.primary_group.primary_group_name
+    get_primary_group_name.short_description = 'Primary Group Name'
 
-    def get_subcategory_name(self, obj):
-        return obj.subcategory_name
-    get_subcategory_name.short_description = 'Subcategory Name'
+    def get_group_number(self, obj):
+        return obj.group_number
+    get_group_number.short_description = 'Group Number'
 
-@admin.register(IndividualAccount)
-class IndividualAccountAdmin(admin.ModelAdmin):
-    form = IndividualAccountAdminForm
-    list_display = ('get_category_number', 'get_category_name', 'get_subcategory_number', 'get_subcategory_name', 'get_account_number', 'account_name')
-    search_fields = ('account_name',)
-    list_filter = ('subcategory__category',)
+@admin.register(Ledger)
+class LedgerAdmin(admin.ModelAdmin):
+    form = LedgerAdminForm
+    list_display = ('get_primary_group_number', 'get_primary_group_name', 'get_group_number', 'get_group_name', 'get_ledger_number', 'ledger_name')
+    search_fields = ('ledger_name',)
+    list_filter = ('group__primary_group', 'group',)
     actions = [export_as_csv]
 
-    def get_category_number(self, obj):
-        return obj.subcategory.category.category_number
-    get_category_number.short_description = 'Category Number'
+    def get_primary_group_number(self, obj):
+        return obj.group.primary_group.primary_group_number
+    get_primary_group_number.short_description = 'Primary Group Number'
 
-    def get_category_name(self, obj):
-        return obj.subcategory.category.category_name
-    get_category_name.short_description = 'Category Name'
+    def get_primary_group_name(self, obj):
+        return obj.group.primary_group.primary_group_name
+    get_primary_group_name.short_description = 'Primary Group Name'
 
-    def get_subcategory_number(self, obj):
-        return obj.subcategory.subcategory_number
-    get_subcategory_number.short_description = 'Subcategory Number'
+    def get_group_number(self, obj):
+        return obj.group.group_number
+    get_group_number.short_description = 'Group Number'
 
-    def get_subcategory_name(self, obj):
-        return obj.subcategory.subcategory_name
-    get_subcategory_name.short_description = 'Subcategory Name'
+    def get_group_name(self, obj):
+        return obj.group.group_name
+    get_group_name.short_description = 'Group Name'
 
-    def get_account_number(self, obj):
-        return obj.account_number
-    get_account_number.short_description = 'Account Number'
-
-
+    def get_ledger_number(self, obj):
+        return obj.ledger_number
+    get_ledger_number.short_description = 'Ledger Number'
 
 @admin.register(JournalEntries)
 class JournalEntriesAdmin(admin.ModelAdmin):
     form = JournalEntriesAdminForm
-    list_display = ('s_no','voucherCode','voucherNo', 'date', 'narration', 'account', 'debit', 'credit')
-    list_filter = ('date', 'account')
-    search_fields = ('narration', 'account')
+    list_display = ('s_no', 'voucherCode', 'voucherNo', 'date', 'narration', 'ledger', 'debit', 'credit')
+    list_filter = ('date', 'ledger')
+    search_fields = ('narration', 'ledger')

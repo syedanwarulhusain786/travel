@@ -6,9 +6,9 @@ class JournalEntryFilter(django_filters.FilterSet):
         fields=[
             'voucherCode',
             'date',
-            'category',
-            'subcategory',
-            'account'
+            'primary_group',
+            'group',
+            'ledger'
             
             
         ]
