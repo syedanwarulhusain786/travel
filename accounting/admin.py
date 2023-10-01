@@ -2,8 +2,20 @@ from django.contrib import admin
 from django import forms
 import csv
 from django.http import HttpResponse
-from .models import Primary_Group, Group, Ledger, JournalEntries
+from .models import Primary_Group, Group, Ledger, JournalEntries,SalesReceipt,PurchaseReceipt,Receipt,Payment
+class SalesReceiptAdmin(admin.ModelAdmin):
+    list_display = ('date', 's_no', 'voucherNo', 'voucherCode','deb_primary_group', 'deb_group','deb_ledger','cred_primary_group', 'cred_group','cred_ledger', 'decsription', 'amount', 'total')
 
+admin.site.register(SalesReceipt, SalesReceiptAdmin)
+
+
+admin.site.register(PurchaseReceipt)
+
+
+admin.site.register(Receipt)
+
+
+admin.site.register(Payment)
 # Export selected objects as CSV
 def export_as_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')

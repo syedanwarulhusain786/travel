@@ -1,450 +1,390 @@
-
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
- <style>
-/* Loading animation styles (you can replace this with your animation) */
-.loading {
-  width: 50px;
-  height: 50px;
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #3498db;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto;
-}
+<style>
+    /* Loading animation styles (you can replace this with your animation) */
+    .loading {
+        width: 50px;
+        height: 50px;
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
 
-/* Checkmark styles */
-.checkmark {
-  font-size: 48px;
-  color: #4CAF50; /* Green color for checkmark */
-  display: none; /* Initially hide the checkmark */
-}
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 
- </style>
-       
-       
-       <!-- ====================================
+    /* Checkmark styles */
+    .checkmark {
+        font-size: 48px;
+        color: #4CAF50;
+        /* Green color for checkmark */
+        display: none;
+        /* Initially hide the checkmark */
+    }
+</style>
+
+<style>
+    /* Custom CSS for styling */
+    .icon-label {
+        display: flex;
+        align-items: center;
+        font-size: 24px;
+        /* Adjust the font size as needed */
+    }
+
+    .icon {
+        width: 64px;
+        /* Adjust the icon size as needed */
+        height: 64px;
+        margin-right: 10px;
+        /* Add some spacing between the icon and text */
+    }
+
+    .radio-button {
+        width: 24px;
+        /* Adjust the radio button size as needed */
+        height: 24px;
+        margin-right: 5px;
+        /* Add some spacing between the radio button and text */
+    }
+</style>
+
+
+<!-- ====================================
         ——— CONTENT WRAPPER
         ===================================== -->
-        <div class="content-wrapper">
-          <div class="content">                
-                  <!-- Top Statistics -->
-<div class="container mt-5 text-center" style="max-width:1450;">
-    <div class="card">
-        <div class="card-header text-center">
-            <span class="mdi-format-float-left"></span>
-            
-            <h4>Add Reciept Entry
-            </h4>
-            <!-- Expand Left -->
-        </div>
-        <div class="card-body">
-            <form id="myActualForm" method="Post">
-                {% csrf_token %}
-                <!-- Centered Fields -->
-                <div class="text-center">
-                    <div class="form-group text-center">
-                        <div class="row" style="
-                        margin-left: 255px;
-                    ">
-                            <label for="journal_date">Date <span class="text-danger">*&emsp;</span></label>
-                            <input type="date" class="form-control col-6" id="journal_date" required>
-                        </div>
-                    </div>
-                    <div class="form-group text-center">
-                        <div class="row" style="
-                        margin-left: 155px;
-                    ">
-                            <label class="col-form-label" for="voucher_no">Journal Voucher No &emsp;</label>
-                            <input type="text" class="form-control col-6" id="voucher_no" readonly value="">
-                        </div>
-                    </div>
-                    <div class="form-group text-center">
-                        <div class="row" style="
-                        margin-left: 155px;
-                    ">
-                            <label class="col-form-label" for="voucher_no">Invoice Voucher No &emsp;</label>
-                            <input type="text" class="form-control col-6" id="invoice_no"  value="">
-                        </div>
-                    </div>
-                    <div class="form-group text-center">
-                        <div class="row" style="
-                        margin-left: 252px;
-                        padding-left: 0px;
-                    ">
-                            <label for="notes">Notes &emsp;</label>
-                            <textarea class="form-control col-6" id="notes" rows="3" placeholder="Write something here..."></textarea>
-                            
-                        </div>
-                    </div>
-            </div>
-
-                <!-- Table -->
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="transactionTable">
-                        <thead>
-                            <tr>
-                                <th>Account</th>
-                                <th>Category</th>
-                                <th>Sub Category</th>
-                                <th>Narration</th>
-                                <th>Debit</th>
-                                <th>Credit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            <tr>
-                                <td>
-                                    <select class="form-control" id="dropdown1">
-                                        {% for account in account_list %}
-                                    <option data-value="{{ account.subcategory.category.category_name }}" data-tokens="{{ account.subcategory }}" id="{{ account.account_number.subcategory_name }}" value="{{ account.account_number }}">{{ account.account_name }}</option>
-                        
-                                        
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="text" id="cat1" name="cat1" disabled>
-                            
-                                </td>
-                                <td>
-                                    <input type="text" id="sub1" disabled>
-                                </td>
-                                <td><input type="text" class="form-control" id="nar1"></td>
-                                <td><input type="number" class="form-control" step="0.01" id="deb1"></td>
-
-                                <td><input type="number" class="form-control" step="0.01" id="cre1"></td>
-                                <td></td>
-                            </tr>
-      
-
-                        </tbody>
-                    </table>
+<div class="content-wrapper">
+    <div class="content">
+        <!-- Top Statistics -->
+        <div class="container mt-5 text-center" style="max-width:1920px;">
+            <div class="card">
+                <div class="card-header text-left">
+                    <label for="cashRadio">
+                        <img src="{% static 'icons/cash.png' %}" alt="Cash Icon" width="55" height="64">
+                        Cash
+                    </label>
+                    <input type="radio" id="cashRadio" name="paymentType" value="cash" checked>
+                    <label for="bankRadio">
+                        <img src="{% static 'icons/bank.png' %}" alt="Bank Icon" width="55" height="64">
+                        Bank
+                    </label>
+                    <input type="radio" id="bankRadio" name="paymentType" value="bank">
                 </div>
 
-                <!-- Submit Button -->
-    <!-- Submit Button -->
-    <div class="form-group text-center my-5">
-        <button type="button" class="btn btn-primary" id="submitForm" disabled>Submit</button>
-        <button type="button" class="btn btn-primary" id="clearFormButton">Clear</button>
+                <div class="card-body">
+                    <form id="myActualForm" method="Post">
+
+                        {% csrf_token %}
+
+           
+
+
+
+
+
+                       
+                        <div id="bankForm" style="display: block;">
+                            <div class="card">
+                                <div class="form-group">
+                                    <div class="container">
+                                        <div class="row">
+
+                                            <div class="col">
+                                                <label class="col-form-label" for="bankjournal_date">Date <span
+                                                        class="text-danger">*&emsp;</span></label>
+                                                <input type="date" class="form-control" id="bankjournal_date" required>
+                                            </div>
+                                            <div class="col">
+                                                <label class="col-form-label" for="voucher_no">Reciept Voucher No <span
+                                                        class="text-danger">*&emsp;</span></label>
+                                                <input type="text" class="form-control " id="bankvoucher_no" readonly
+                                                    value="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+                            <div class="card">
+                                <div class="form-group">
+                                    <div class="row">
+
+
+
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col" style="display: none;">
+                                                    <label class="col-form-label" for="bankDr">Debit&emsp;</label>
+                                                    <select class="form-control" id="bankDr">
+                                                        {% for bank in banks %}
+                                                        <option id="cur" value="{{ bank.ledger_name }}">{{ bank.ledger_name }}
+                                                        </option>
+
+
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col" style="display: none;">
+                                                    <label class="col-form-label" for="bank_currency">Transaction
+                                                        Currency&emsp;</label>
+                                                    <select class="form-control" id="bank_currency">
+                                                        {% for curr in currency %}
+                                                        <option id="cur" value="{{ curr.key }}">{{ curr.value }}
+                                                        </option>
+
+
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <label class="col-form-label" for="bankAmt_inWords"> Amount In Words
+                                                        :&emsp;</label>
+                                                    <input type="text" class="form-control" id="bankAmt_inWords" 
+                                                        value="">
+                                                </div>
+                                                <div class="col">
+                                                    <label class="col-form-label" for="bankAmt_in_No"> Amount in
+                                                        Figures: &emsp;</label>
+                                                    <input type="number" class="form-control" id="bankAmt_in_No"  step="0.1"
+                                                        value="">
+                                                </div>
+                                                
+
+                                            </div>
+                                 
+
+
+                                            <div class="row">
+                                                <div class="col" style="display: none;">
+                                                    <label class="col-form-label" for="chequeNumber">Cheque Number
+                                                        &emsp;</label>
+                                                    <input type="text" class="form-control" id="chequeNumber" value="" disabled  >
+                                                </div>
+                                                <div class="col" style="display: none;">
+                                                    <label class="col-form-label" for="chequeDate">Date
+                                                        &emsp;</label>
+                                                    <input type="date" class="form-control" id="chequeDate" value="" disabled >
+                                                </div>
+                                                
+                                                <div class="col" style="display: none;">
+                                                    <label class="col-form-label" for="clearanceDate">Clearance Date
+                                                        &emsp;</label>
+                                                    <input type="date" class="form-control" id="clearanceDate" value="" disabled>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="row">
+                                                <div class="col" style="display: none;">
+                                                    <label class="col-form-label" for="transactionType">Transaction Type
+                                                        &emsp;</label>
+                                                    <select class="form-control" id="transactionType">
+
+                                                        <option value="NEFT">NEFT (National Electronic Funds Transfer)
+                                                        </option>
+                                                        <option value="RTGS">RTGS (Real Time Gross Settlement)
+                                                        </option>
+                                                        <option value="IMPS">IMPS (Immediate Payment Service)
+                                                        </option>
+                                                        <option value="UPI">UPI (Unified Payments Interface)
+                                                        </option>
+                                                        <option value="SWIFT">SWIFT (Society for Worldwide Interbank
+                                                            Financial Telecommunication)
+
+                                                        </option>
+                                                        <option value="Cheque">Cheque
+                                                        </option>
+
+
+                                                    </select>
+                                                </div>
+                                                <div class="col">
+                                                    <label class="col-form-label" for="cashTransaction_Id">Remark/Transaction Id
+                                                        &emsp;</label>
+                                                    <input type="text" class="form-control" id="cashTransaction_Id" value="">
+                                                </div>
+                                                <div class="col">
+                                                    <label class="col-form-label" for="RecievedFrom">Recieved From
+                                                        &emsp;</label>
+                                                    <input type="text" class="form-control" id="RecievedFrom" value="">
+                                                </div>
+                                                <div class="col" id="cash_ledgers">
+                                                    <label class="col-form-label" for="cashtransactionType">Debit
+                                                        &emsp;</label>
+                                                        <select class="form-control" id="cashtransactionType">
+
+                                                            {% for cash in cashs %}
+                                                            <option id="cur" value="{{ cash.ledger_name }}">{{ cash.ledger_name }}
+                                                            </option>
+                                                            {% endfor %}
+    
+                                                        </select>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-left: 400px; padding-top: 10px;">
+                                                <div class="col-form-label">
+                                                    <label for="Banknotes"
+                                                        style="font-size: 24px; font-weight: bold;">Narrations
+                                                        &emsp;</label>
+                                                    <textarea id="Banknotes" rows="5" cols="10"
+                                                        style="font-size: 18px; width: 500px; border: 2px solid #ccc; padding: 10px;"
+                                                        placeholder="Write something here..."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            
+                            <!-- Table -->
+
+                        </div>
+                        <div class="card">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="transactionTable">
+                                    <thead>
+                                        <tr>
+
+                                            <th>Account</th>
+                                            <th>Primary Group</th>
+                                            <th>Group</th>
+                                            <th>Reference</th>
+                                            <th>Bill Number</th>
+                                            <th>Amount</th>
+                                            <th>Credit</th>
+                                            <th>Remove</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr>
+                                            
+                                            <td>
+                                                <select class="form-control" id="dropdown1">
+                                                    {% for account in account_list %}
+                                                    <option
+                                                        data-value="{{ account.group.primary_group.primary_group_name }}"
+                                                        data-tokens="{{ account.group }}"
+                                                        id="{{ account.ledger_number.subcategory_name }}"
+                                                        value="{{ account.ledger_number }}">{{ account.ledger_name }}
+                                                    </option>
+
+
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" id="cat1" name="cat1" disabled>
+
+                                            </td>
+                                            <td>
+                                                <input type="text" id="sub1" disabled>
+                                            </td>
+
+                                            <td><input type="text" class="form-control" id="ref1"></td>
+                                            <td><input type="text" class="form-control" id="bill1"></td>
+                                            <td><input type="number" class="form-control" step="0.01" id="amt1"></td>
+                                            <td><input type="number" class="form-control" step="0.01" id="cre1"></td>
+
+
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                
+                                                        <button type="button" class="btn btn-primary" id="addRowButton">Add Row</button>
+                                            </td>
+                                            <td>
+
+
+                                            </td>
+                                            <td>
+
+                                            </td>
+                                            <td>
+
+                                            </td>
+                                            <td><span><b>Total:</b></span></td>
+                                            <td><input type="number" class="form-control" step="0.01" id="d_total"
+                                                    disabled>
+                                            </td>
+
+                                            <td><input type="number" class="form-control" step="0.01" id="c_total"
+                                                    disabled>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <!-- Submit Button -->
+                            <div class="form-group text-center my-5">
+                                <button type="button" class="btn btn-primary" id="submitForm" disabled>Submit</button>
+                                <button type="button" class="btn btn-primary" id="clearFormButton">Clear</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
     </div>
-            </form>
+</div>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="subTableModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="subTableModalLabel">
+                    <h2 style="margin-left: 200px;">
+                        <div id="loading-animation" class="loading"></div>
+                        <div id="success-checkmark" class="checkmark">&#10003;</div>
+                    </h2>
+                </h5>
+                <button type="button" class="close" id="closeModal" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="subTableContent">
+
+                <p>Voucher No: <span><input type="text" id="voucherNo"></span></p>
+                <p>Voucher Code: <span><input type="text" id="voucherCode"></span></p>
+                <p>Account: <span><input type="text" id="account"></span></p>
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="closeModalq"
+                    aria-label="Close">Close</button>
+            </div>
         </div>
     </div>
 </div>
 
-           </div>
-        </div>
-<!-- The modal -->
+<script src="{% static '\home\js\reciept.js' %}"></script>
 
-  <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="subTableModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="subTableModalLabel">        <h2 style="margin-left: 200px;"><div id="loading-animation" class="loading"></div>
-            <div id="success-checkmark" class="checkmark">&#10003;</div></h2>
-          </h5> 
-          <button type="button" class="close" id="closeModal" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body" id="subTableContent">
-                   
-      <p>Voucher No:  <span><input type="text" id="voucherNo" ></span></p>
-      <p>Voucher Code: <span><input type="text" id="voucherCode" ></span></p>
-      <p>Account: <span ><input type="text" id="account" ></span></p>
-        </div>
-        <div class="modal-footer">
-
-          <button type="button" class="btn btn-secondary" data-dismiss="modal" id="closeModalq" aria-label="Close">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>  
-    <script>
-            // Get a reference to the date input element
-            const dateInput = document.getElementById('journal_date');
-    
-            // Create a new Date object for today's date
-            const today = new Date();
-    
-            // Get the year, month, and day in the format "YYYY-MM-DD"
-            const year = today.getFullYear();
-            const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
-            const day = today.getDate().toString().padStart(2, '0');
-    
-            // Set the value of the date input to today's date
-            dateInput.value = `${year}-${month}-${day}`;
-        </script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const tableBody = document.querySelector("#transactionTable tbody");
-
-    tableBody.addEventListener('change', function(event) {
-        const dropdown = event.target;
-        if (dropdown.tagName === 'SELECT' && dropdown.id.startsWith('dropdown')) {
-            const rowNum = dropdown.id.replace('dropdown', '');
-            const catInput = document.getElementById(`cat${rowNum}`);
-            const subInput = document.getElementById(`sub${rowNum}`);
-
-            const selectedOption = dropdown.options[dropdown.selectedIndex];
-            const subcategory = selectedOption.getAttribute('data-tokens');
-            const category = selectedOption.getAttribute('data-value');
-
-            console.log(`Selected Account Number for Row ${rowNum}:`, category);
-            catInput.value = category;
-            subInput.value = subcategory;
-        }
-    });
-});
-
-
-
-
-
-
-</script> 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-    // ...
-
-    // Get a reference to the "Add Row" button
-    const addRowButton = document.getElementById("addRowButton");
-
-    // Function to add a new row to the table
-    function addNewRow() {
-        const table = document.getElementById("transactionTable");
-        const newRow = table.insertRow(table.rows.length-1); // Insert before the last row
-
-        // Clone the cells from an existing row (you can choose any row as a template)
-        const templateRow = table.rows[1]; // Assuming the second row (index 1) is your template
-        for (let i = 0; i < templateRow.cells.length; i++) {
-            const newCell = newRow.insertCell(i);
-            newCell.innerHTML = templateRow.cells[i].innerHTML;
-        }
-
-        // Update the IDs of the cloned elements to avoid duplicates
-        const rowIndex = table.rows.length - 2; // Index of the new row (0-based)
-        const elementsToChange = newRow.querySelectorAll("[id]");
-        elementsToChange.forEach(function (element) {
-            const id = element.getAttribute("id");
-            const idParts = id.split(/\d+/);
-            const num = rowIndex + 1; // Adding 1 to match the row number
-            element.setAttribute("id", idParts[0] + num);
-            element.setAttribute("name", idParts[0] + num); // Also update the 'name' attribute if needed
-            // element.value = ""; // Clear the input values in the new row
-        });
-
-        
-    }
-
-    // Add a click event listener to the "Add Row" button
-    addRowButton.addEventListener("click", addNewRow);
-});
-
-</script>
-<script>
-   document.addEventListener("DOMContentLoaded", function() {
-    // Get references to elements
-
-    const csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value; // Get the CSRF token from the form
-    const form = document.getElementById("myActualForm");
-    const submitButton = document.getElementById("submitForm");
-    const clearFormButton = document.getElementById("clearFormButton");
-    submitButton.addEventListener("click", function() {
-        // Create a FormData object
-        const formData = new FormData();
-        const tableRows = form.querySelectorAll("tbody tr");
-        const voucher=document.getElementById("voucher_no").value;
-        const notes=document.getElementById("notes").value;
-        formData.append(`notes`, notes);
-        formData.append(`voucher`, voucher);
-        tableRows.forEach((row, index) => {
-            const select = row.querySelector("select");
-            
-
-            const cat = row.querySelector(`#cat${index + 1}`);
-            const sub = row.querySelector(`#sub${index + 1}`);
-            const nar = row.querySelector(`#nar${index + 1}`);
-            const cre = row.querySelector(`#cre${index + 1}`);
-            const deb = row.querySelector(`#deb${index + 1}`);
-
-            // Append each field to the FormData object
-            formData.append(`dropdown${index + 1}`, select.value);
-            
-
-
-            formData.append(`cat${index + 1}`, cat.value);
-            formData.append(`sub${index + 1}`, sub.value);
-            formData.append(`nar${index + 1}`, nar.value);
-            formData.append(`cre${index + 1}`, cre.value);
-            formData.append(`deb${index + 1}`, deb.value);
-        });
-
-        // Make an AJAX POST request
-        fetch("/submit_journal/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrfToken, // Include CSRF token
-            },
-            body: formData, // Use the FormData object
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response from the server
-            updateModalData(data);
-            // Hide loading animation and show checkmark
-            setTimeout(function () {
-                $('#loading-animation').hide();
-            $('#success-checkmark').show();
-    }, 1500);
-           
-        })
-        .catch(error => {
-            console.error("Error submitting the form:", error);
-        });
-    });
-        });
-
-clearFormButton.addEventListener("click", function() {
-        // Reset the form fields to their default values
-        const form = document.getElementById("myActualForm");
-        const tableRows = form.querySelectorAll("tbody tr");
-
-        tableRows.forEach((row, index) => {
-            const select = row.querySelector("select");
-            const cat = row.querySelector(`#cat${index + 1}`);
-            const sub = row.querySelector(`#sub${index + 1}`);
-            const nar = row.querySelector(`#nar${index + 1}`);
-            const cre = row.querySelector(`#cre${index + 1}`);
-            const deb = row.querySelector(`#deb${index + 1}`);
-
-            // Clear the form fields
-            select.value = ''; // Clear the select value
-            cat.value = ''; // Clear the cat input value
-            sub.value = ''; // Clear the sub input value
-            nar.value = ''; // Clear the nar input value
-            cre.value = ''; // Clear the cre input value
-            deb.value = ''; // Clear the deb input value
-        });
-    });
-// Update the modal content with data
-function updateModalData(data) {
-    const account = data.message.account;
-    const voucherCode = data.message.voucherCode;
-    const voucherNo = data.message.voucherNo;
-    const modal = document.getElementById('myModal');
-    const closeBtn = document.getElementsByClassName('close')[0];
-    const closeBtn1 = document.getElementById('closeModalq');
-
-    const voucherNoElement = document.getElementById('voucherNo');
-    const voucherCodeElement = document.getElementById('voucherCode');
-    const accountElement = document.getElementById('account');
-    voucherNoElement.value = voucherNo;
-    voucherCodeElement.value =voucherCode;
-    accountElement.value = account;
-    modal.style.display = 'block';  // Show the modal
-
-  // Close the modal when the close button is clicked
-closeBtn.addEventListener('click', () => {
-  modal.style.display = 'none';
-
-});
-
-closeBtn1.addEventListener('click', () => {
-  modal.style.display = 'none';
-  const clearFormButton = document.getElementById("clearFormButton");
-
-// Simulate a click event on the clearFormButton
-    clearFormButton.click();
-});
-}
-    </script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-    const voucher_numbe = document.getElementById("voucher_no");
-    generateAccountNumber()
- 
-
-    function generateAccountNumber() {
-    // Make an AJAX request to your Django backend to get the next available account number
-    fetch("/get_next_voucher_number/") // Replace with your Django endpoint URL
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                voucher_numbe.value = data.voucher_numbe;
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching account number:", error);
-        });
-}
-
-    // You can also submit the form data to the Django backend using AJAX or a form submission, depending on your preference.
-});
-</script>
-
-
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Attach input event listeners to elements with IDs starting with "cre" or "deb"
-    const container = document.getElementById('transactionTable'); //
-    const submitButton = document.getElementById('submitForm');
-
-
-    // Function to calculate and log the totals
-    function calculateAndLogTotals() {
-        let creTotal = 0;
-        let debTotal = 0;
-
-        // Calculate the total of "cre" inputs
-        const creInputs = container.querySelectorAll('input[id^="cre"]');
-        creInputs.forEach(input => {
-            const value2 = parseFloat(input.value) || 0; // Convert input value to a number, default to 0 if not a valid number
-            creTotal += value2;
-        });
-
-        // Calculate the total of "deb" inputs
-        const debInputs = container.querySelectorAll('input[id^="deb"]');
-        debInputs.forEach(input => {
-            const value1 = parseFloat(input.value) || 0; // Convert input value to a number, default to 0 if not a valid number
-            debTotal += value1;
-    
-
-        });
-
-        // Log the totals to the console
-        
-        // console.log("Total Credit:", creTotal.toFixed(2));
-        // console.log("Total Debit:", debTotal.toFixed(2));
-        const total_deb = document.getElementById("d_total");
-        const total_cred = document.getElementById("c_total");
-        total_deb.value=debTotal.toFixed(2)
-        total_cred.value= creTotal.toFixed(2)
-        // Set the total values in the corresponding input fields
-    
-
-        // Check if the difference between "Total Credit" and "Total Debit" is not zero
-        if (creTotal == debTotal && creTotal !== 0 && debTotal !== 0) {
-            // Enable the submit button
-            submitButton.removeAttribute('disabled');
-        } else {
-            // Disable the submit button
-            submitButton.setAttribute('disabled', 'disabled');
-        }
-    }
-    container.addEventListener("input", calculateAndLogTotals);
-});
-
-</script>
-  {% endblock %}
+{% endblock %}

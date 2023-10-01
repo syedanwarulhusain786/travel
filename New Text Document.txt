@@ -1,1 +1,8 @@
 kazimsyed715@gmail.com
+
+
+sudo ln -s /etc/nginx/sites-crm/etc/nginx/sites-enabled/
+
+
+
+sudo vim /etc/nginx/sites-available/crm

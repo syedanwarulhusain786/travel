@@ -38,6 +38,7 @@ from django.core.paginator import Paginator
 from .filters import JournalEntryFilter  
 from django.db.models import Q    
 from datetime import datetime 
+from accounting.currency import currency_symbols
 def autocomplete(request):
     term = request.GET.get('term', '')
     # Implement your logic to fetch suggestions based on the input term
@@ -69,6 +70,43 @@ def get_next_voucher_number(request):
         next_account_number = 'JV-'+str(100)  # Initial account number
 
     return JsonResponse({'success': True, 'voucher_numbe': next_account_number})    
+def get_next_payment_voucher_number(request):
+    
+    try:
+        last_account = Payment.objects.latest('voucherNo')
+        next_account_number = 'Pay-{}'.format(str(int(last_account.voucherNo) + 1))
+    except Payment.DoesNotExist:
+        next_account_number = 'Pay-'+str(10000)  # Initial account number
+
+    return JsonResponse({'success': True, 'voucher_numbe': next_account_number})    
+def get_next_reciept_voucher_number(request):
+    
+    try:
+        last_account = Receipt.objects.latest('voucherNo')
+        next_account_number = 'Recieve-{}'.format(str(int(last_account.voucherNo) + 1))
+        print(get_next_reciept_voucher_number)
+    except Receipt.DoesNotExist:
+        next_account_number = 'Recieve-'+str(10000)  # Initial account number
+
+    return JsonResponse({'success': True, 'voucher_numbe': next_account_number})    
+def get_next_sales_voucher_number(request):
+    
+    try:
+        last_account = SalesReceipt.objects.latest('voucherNo')
+        next_account_number = 'Sales-{}'.format(str(int(last_account.voucherNo) + 1))
+    except SalesReceipt.DoesNotExist:
+        next_account_number = 'Sales-'+str(10000)  # Initial account number
+
+    return JsonResponse({'success': True, 'voucher_numbe': next_account_number})
+def get_next_purchase_voucher_number(request):
+    
+    try:
+        last_account = PurchaseReceipt.objects.latest('voucherNo')
+        next_account_number = 'PR-{}'.format(str(int(last_account.voucherNo) + 1))
+    except PurchaseReceipt.DoesNotExist:
+        next_account_number = 'PR-'+str(10000)  # Initial account number
+
+    return JsonResponse({'success': True, 'voucher_numbe': next_account_number})
 def action(request):
     if request.method == "POST":
         data = request.POST  # Get the POST data
@@ -280,11 +318,15 @@ def Gernal_Ledger(request):
   
 
 def paymentEntry(request):
-    print(request.user.username)    
-               
-
+    Category_list=Primary_Group.objects.all()
+    Subcategory_list = Group.objects.all()
+    banks = Ledger.objects.filter(group__group_name__in=["BANK ACCOUNTS"])
+    cash= Ledger.objects.filter(group__group_name__in=["Cash"])
+    accounts = Ledger.objects.exclude(group__group_name__in=["Cash", "BANK ACCOUNTS"])
+    currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
     return render(request, 'paymentVoucher.html', context={
-        'username':request.user
+        'username':request.user,'Category_list':Category_list,'Subcategory_list':Subcategory_list,'account_list':accounts,'currency':currency,'banks':banks,
+        'cashs':cash
     })
 def paymentList(request):
     print(request.user.username)    
@@ -293,13 +335,229 @@ def paymentList(request):
     return render(request, 'paymentList.html', context={
         'username':request.user
     })
-def recieptEntry(request):
-    print(request.user.username)    
-               
 
+def submit_payment(request):
+    invoicedate=voucher_no=invoicedate=transactionType=bankAmt_inWords=Banknotes=total=None
+    cashtransactionType=transactionType=bank_currency=chequeNumber=chequeDate=clearanceDate=None
+    bankDr=bank_currency=transaction_type=cheque_no=chequeDate=clearanceDate=None
+    
+    try:
+        data = request.POST # Replace with your actual QueryDict data
+        voucher_no = data.get(f'bankvoucher_no', '')
+        invoicedate = data.get(f'bankjournal_date', '')
+        ttype = data.get(f'ttype', '')
+        bankAmt_inWords = data.get(f'bankAmt_inWords', '')
+        bankAmt_in_No =data.get(f'bankAmt_in_No', '')
+        Banknotes = data.get(f'Banknotes', '')
+        RecievedFrom = data.get(f'RecievedFrom', '')
+        total = data.get(f'total', '')
+        remark = data.get(f'cashTransaction_Id', '')
+        
+        if ttype=='cash':
+            cashtransactionType = data.get(f'cashtransactionType', '')
+            
+            deb_account = Ledger.objects.get(ledger_name=cashtransactionType.split('-')[-1])  # Replace with the appropriate field
+            deb_subcategory = deb_account.group
+            deb_category = deb_account.group.primary_group
+            method='cash'  
+        
+        else:
+            transactionType =data.get(f'transactionType', '')
+            if transactionType=='Cheque':
+                chequeNumber =data.get(f'chequeNumber', '')
+                chequeDate = data.get(f'chequeDate', '')
+                clearanceDate = data.get(f'clearanceDate', 'YYYY-MM-DD')
+            bank_currency = data.get(f'bank_currency', '')
+            
+            bankDr = data.get(f'bankDr', '')
+            deb_account = Ledger.objects.get(ledger_name=bankDr)  # Replace with the appropriate field
+            deb_subcategory = deb_account.group
+            deb_category = deb_account.group.primary_group  
+            method='bank'  
+            
+        try:
+            # Loop through the data to create and save JournalEntries instances
+            for i in range(1, 10):  # Assuming you have four sets of data (1 to 4)
+                # Replace 'voucher' with the actual key in your QueryDict
+                # narration = data.get(f'nar{i}', '')  # Replace 'nar' with the actual key in your QueryDict
+                category_name = data.get(f'cat{i}', '')
+                subcategory_name = data.get(f'sub{i}', '')
+                ref = data.get(f'ref{i}', 0)
+                bill = data.get(f'bill{i}', 0)
+                amt = data.get(f'amt{i}', 0)
+                cred = data.get(f'cred{i}', 0)
+                account_num=data.get(f'dropdown{i}', 0)  # Default to 0 if not present or invalid
+                print(account_num)
+                # try:
+                        # Fetch the corresponding Category, Subcategory, and IndividualAccount instances
+                cre_account = Ledger.objects.get(ledger_number=int(account_num))  # Replace with the appropriate field
+                cre_subcategory = cre_account.group
+                cre_category = cre_account.group.primary_group
+                # Create and save the JournalEntries instance
+                entry = Payment(
+                    date=invoicedate,
+                    voucherNo=voucher_no.split('-')[-1],
+                    voucherCode=voucher_no,
+                    receipt_method=method,
+                    amount_in_words=bankAmt_inWords,
+                    amount_in_numbers=bankAmt_in_No,
+                    received_from=RecievedFrom,
+                    remarks=remark,
+                    narration=Banknotes,
+                    d_ledger=deb_account,
+                    d_primary_group=deb_category,
+                    d_group=deb_subcategory,
+                    c_ledger=cre_account,
+                    c_primary_group=cre_subcategory,
+                    c_group=cre_category,
+                    reference=ref,
+                    reference_bill_number=bill,
+                    reference_bill_amount = amt,
+                    debit = cred,
+                    transaction_currency = bank_currency,
+                    clearance_date =clearanceDate,
+                    transaction_type = transactionType,
+                    cheque_no = chequeNumber,
+                    bank_date = chequeDate,
+
+                )
+                entry.save()
+        except Primary_Group.DoesNotExist:
+            pass
+        except Group.DoesNotExist:
+            pass
+        except Ledger.DoesNotExist:
+            pass
+        entry_response = {
+                "voucherNo": entry.voucherNo,
+                "voucherCode": entry.voucherCode,  # Assuming you have a 'voucherCode' field in your model
+                "account": entry.d_ledger.ledger_name,  # Assuming 'account_name' is the relevant field in 'IndividualAccount'
+            }
+        print(entry_response)
+        return JsonResponse({'success': True, 'message': 'Sucess'})            
+    except Exception as e:
+        print(e)
+        return JsonResponse({'success': False, 'message': 'Invalid request'})
+    
+
+
+
+
+def recieptEntry(request):
+    Category_list=Primary_Group.objects.all()
+    Subcategory_list = Group.objects.all()
+    banks = Ledger.objects.filter(group__group_name__in=["BANK ACCOUNTS"])
+    cash= Ledger.objects.filter(group__group_name__in=["Cash"])
+    accounts = Ledger.objects.exclude(group__group_name__in=["Cash", "BANK ACCOUNTS"])
+    currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
     return render(request, 'recieptVoucher.html', context={
-        'username':request.user
-    })  
+        'username':request.user,'Category_list':Category_list,'Subcategory_list':Subcategory_list,'account_list':accounts,'currency':currency,'banks':banks,
+        'cashs':cash
+    })
+  
+def submit_reciept(request):
+    invoicedate=voucher_no=invoicedate=transactionType=bankAmt_inWords=Banknotes=total=None
+    cashtransactionType=transactionType=bank_currency=chequeNumber=chequeDate=clearanceDate=None
+    bankDr=bank_currency=transaction_type=cheque_no=chequeDate=clearanceDate=None
+    
+    try:
+        data = request.POST # Replace with your actual QueryDict data
+        voucher_no = data.get(f'bankvoucher_no', '')
+        invoicedate = data.get(f'bankjournal_date', '')
+        ttype = data.get(f'ttype', '')
+        bankAmt_inWords = data.get(f'bankAmt_inWords', '')
+        bankAmt_in_No =data.get(f'bankAmt_in_No', '')
+        Banknotes = data.get(f'Banknotes', '')
+        RecievedFrom = data.get(f'RecievedFrom', '')
+        total = data.get(f'total', '')
+        remark = data.get(f'cashTransaction_Id', '')
+        
+        if ttype=='cash':
+            cashtransactionType = data.get(f'cashtransactionType', '')
+            
+            deb_account = Ledger.objects.get(ledger_name=cashtransactionType.split('-')[-1])  # Replace with the appropriate field
+            deb_subcategory = deb_account.group
+            deb_category = deb_account.group.primary_group
+            method='cash'  
+        
+        else:
+            transactionType =data.get(f'transactionType', '')
+            if transactionType=='Cheque':
+                chequeNumber =data.get(f'chequeNumber', '')
+                chequeDate = data.get(f'chequeDate', '')
+                clearanceDate = data.get(f'clearanceDate', 'YYYY-MM-DD')
+            bank_currency = data.get(f'bank_currency', '')
+            
+            bankDr = data.get(f'bankDr', '')
+            deb_account = Ledger.objects.get(ledger_name=bankDr)  # Replace with the appropriate field
+            deb_subcategory = deb_account.group
+            deb_category = deb_account.group.primary_group  
+            method='bank'  
+            
+        try:
+            # Loop through the data to create and save JournalEntries instances
+            for i in range(1, 10):  # Assuming you have four sets of data (1 to 4)
+                # Replace 'voucher' with the actual key in your QueryDict
+                # narration = data.get(f'nar{i}', '')  # Replace 'nar' with the actual key in your QueryDict
+                category_name = data.get(f'cat{i}', '')
+                subcategory_name = data.get(f'sub{i}', '')
+                ref = data.get(f'ref{i}', 0)
+                bill = data.get(f'bill{i}', 0)
+                amt = data.get(f'amt{i}', 0)
+                cred = data.get(f'cred{i}', 0)
+                account_num=data.get(f'dropdown{i}', 0)  # Default to 0 if not present or invalid
+                print(account_num)
+                # try:
+                        # Fetch the corresponding Category, Subcategory, and IndividualAccount instances
+                cre_account = Ledger.objects.get(ledger_number=int(account_num))  # Replace with the appropriate field
+                cre_subcategory = cre_account.group
+                cre_category = cre_account.group.primary_group
+                # Create and save the JournalEntries instance
+                entry = Receipt(
+                    date=invoicedate,
+                    voucherNo=voucher_no.split('-')[-1],
+                    voucherCode=voucher_no,
+                    receipt_method=method,
+                    amount_in_words=bankAmt_inWords,
+                    amount_in_numbers=bankAmt_in_No,
+                    received_from=RecievedFrom,
+                    remarks=remark,
+                    narration=Banknotes,
+                    d_ledger=deb_account,
+                    d_primary_group=deb_category,
+                    d_group=deb_subcategory,
+                    c_ledger=cre_account,
+                    c_primary_group=cre_subcategory,
+                    c_group=cre_category,
+                    reference=ref,
+                    reference_bill_number=bill,
+                    reference_bill_amount = amt,
+                    debit = cred,
+                    transaction_currency = bank_currency,
+                    clearance_date =clearanceDate,
+                    transaction_type = transactionType,
+                    cheque_no = chequeNumber,
+                    bank_date = chequeDate,
+
+                )
+                entry.save()
+        except Primary_Group.DoesNotExist:
+            pass
+        except Group.DoesNotExist:
+            pass
+        except Ledger.DoesNotExist:
+            pass
+        entry_response = {
+                "voucherNo": entry.voucherNo,
+                "voucherCode": entry.voucherCode,  # Assuming you have a 'voucherCode' field in your model
+                "account": entry.d_ledger.ledger_name,  # Assuming 'account_name' is the relevant field in 'IndividualAccount'
+            }
+        print(entry_response)
+        return JsonResponse({'success': True, 'message': 'Sucess'})            
+    except Exception as e:
+        print(e)
+        return JsonResponse({'success': False, 'message': 'Invalid request'})
+    
 def recieptList(request):
     print(request.user.username)    
                
@@ -307,14 +565,243 @@ def recieptList(request):
     return render(request, 'recieptList.html', context={
         'username':request.user
     })
+    
+    
+def salesEntry(request):
+    Category_list=Primary_Group.objects.all()
+    Subcategory_list = Group.objects.all()
+    debit = Ledger.objects.filter(group__group_name__in=["Sales"])
+    accounts = Ledger.objects.exclude(group__group_name__in=["Sales"])
+    currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
+    return render(request, 'sales_voucher.html', context={
+        'username':request.user,'Category_list':Category_list,'Subcategory_list':Subcategory_list,'account_list':accounts,'currency':currency,'debit':debit,
+    })  
+def submitSales(request):
+    Category_list=Primary_Group.objects.all()
+    Subcategory_list = Group.objects.all()
+    debit = Ledger.objects.filter(group__group_name__in=["Sales"])
+    accounts = Ledger.objects.exclude(group__group_name__in=["Sales"])
+    currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
+    
+    
+    # try:
+    data = request.POST # Replace with your actual QueryDict data
+    voucher_no = data.get(f'voucher', '')
+    invoicedate = data.get(f'invoice_date', '')
+    debit_led = data.get(f'debit_led', '')
+    total = data.get(f'd_total', '')
+    
+    deb_category = Primary_Group.objects.get(primary_group_name='INCOME')
+    deb_subcategory = Group.objects.get(group_name='Sales')
+    deb_account = Ledger.objects.get(ledger_name=debit_led.split('-')[-1])  # Replace with the appropriate field
+            
+    
+    
+    try:
+    # Loop through the data to create and save JournalEntries instances
+        for i in range(1, 10):  # Assuming you have four sets of data (1 to 4)
+            # Replace 'voucher' with the actual key in your QueryDict
+            # narration = data.get(f'nar{i}', '')  # Replace 'nar' with the actual key in your QueryDict
+            category_name = data.get(f'cat{i}', '')
+            subcategory_name = data.get(f'sub{i}', '')
+            desc = data.get(f'ref{i}', 0)
+            amt = data.get(f'amt{i}', 0)
+            
+            
 
+            account_num=data.get(f'dropdown{i}', 0)  # Default to 0 if not present or invalid
+            print(account_num)
+            
+            try:
+                    # Fetch the corresponding Category, Subcategory, and IndividualAccount instances
+                
+                cre_account = Ledger.objects.get(ledger_number=account_num)  # Replace with the appropriate field
+                cre_subcategory = cre_account.group
+                cre_category = cre_account.group.primary_group
+                print(voucher_no)
+                
+                # Create and save the JournalEntries instance
+                entry = SalesReceipt(
+                    date=invoicedate,
+                    voucherNo=voucher_no.split('-')[-1],
+                    voucherCode=voucher_no,
+                    deb_primary_group=deb_category,
+                    deb_group=deb_subcategory,
+                    deb_ledger=deb_account,
+                    cred_primary_group=cre_category,
+                    cred_group=cre_subcategory,
+                    cred_ledger=cre_account,
+                    decsription=desc,
+                    amount=float(amt),
+                    total=float(total),
+                    
+                    
+                        # You can set comments as needed
+                )
+                entry.save()
+            except Primary_Group.DoesNotExist:
+                pass
+            except Group.DoesNotExist:
+                pass
+            except Ledger.DoesNotExist:
+                pass
+        entry_response = {
+                    "voucherNo": entry.voucherNo,
+                    "voucherCode": entry.voucherCode,  # Assuming you have a 'voucherCode' field in your model
+                    "account": entry.deb_ledger.ledger_name,  # Assuming 'account_name' is the relevant field in 'IndividualAccount'
+                }
+
+        return JsonResponse({'success': True, 'message': 'Sucess'})            
+    except Exception as e:
+        print(e)
+        return JsonResponse({'success': False, 'message': 'Invalid request'})
+        
+    
+    
+    
+    
+    
+    
+    
+
+    
+def salesList(request):
+    Category_list=Primary_Group.objects.all()
+    Subcategory_list = Group.objects.all()
+    banks = Ledger.objects.filter(group__group_name__in=["Bank Account"])
+    cash= Ledger.objects.filter(group__group_name__in=["Cash"])
+    accounts = Ledger.objects.exclude(group__group_name__in=["Cash", "Bank Account"])
+    currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
+    print(currency)
+    return render(request, 'recieptVoucher.html', context={
+        'username':request.user,'Category_list':Category_list,'Subcategory_list':Subcategory_list,'account_list':accounts,'currency':currency,'banks':banks,
+        'cashs':cash
+    })  
+  
+  
+def purchaseEntry(request):
+    Category_list=Primary_Group.objects.all()
+    Subcategory_list = Group.objects.all()
+    debit = Ledger.objects.filter(group__group_name__in=["Purchase"])
+    cash= Ledger.objects.filter(group__group_name__in=["Cash"])
+    accounts = Ledger.objects.exclude(group__group_name__in=["Purchase"])
+    currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
+    return render(request, 'purchaseVoucher.html', context={
+        'username':request.user,'Category_list':Category_list,'Subcategory_list':Subcategory_list,'account_list':accounts,'currency':currency,'debit':debit,
+        'cashs':cash
+    })  
+    
+def purchaseList(request):
+    Category_list=Primary_Group.objects.all()
+    Subcategory_list = Group.objects.all()
+    banks = Ledger.objects.filter(group__group_name__in=["Bank Account"])
+    cash= Ledger.objects.filter(group__group_name__in=["Cash"])
+    accounts = Ledger.objects.exclude(group__group_name__in=["Cash", "Bank Account"])
+    currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
+    print(currency)
+    return render(request, 'purchaseVoucher.html', context={
+        'username':request.user,'Category_list':Category_list,'Subcategory_list':Subcategory_list,'account_list':accounts,'currency':currency,'banks':banks,
+        'cashs':cash
+    })
   
   
   
-  
-  
-  
-  
+def submitpurchase(request):
+    # Category_list=Primary_Group.objects.all()
+    # Subcategory_list = Group.objects.all()
+    # debit = Ledger.objects.filter(group__group_name__in=["Sales"])
+    # accounts = Ledger.objects.exclude(group__group_name__in=["Sales"])
+    # currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
+    
+    
+    # try:
+    data = request.POST # Replace with your actual QueryDict data
+    bankDr = data.get(f'bankDr', '')
+    
+    voucher_no = data.get(f'invoice_no', '')
+    invoicedate = data.get(f'invoice_date', '')
+    debit_led = data.get(f'debit_led', '')
+    total = data.get(f'd_total', '')
+    
+    deb_category = Primary_Group.objects.get(primary_group_name='EXPENSES')
+    deb_subcategory = Group.objects.get(group_name='Purchase')
+    deb_account = Ledger.objects.get(ledger_name=debit_led.split('-')[-1])  # Replace with the appropriate field
+            
+    
+    
+    try:
+    # Loop through the data to create and save JournalEntries instances
+        for i in range(1, 10):  # Assuming you have four sets of data (1 to 4)
+            # Replace 'voucher' with the actual key in your QueryDict
+            # narration = data.get(f'nar{i}', '')  # Replace 'nar' with the actual key in your QueryDict
+            category_name = data.get(f'cat{i}', '')
+            subcategory_name = data.get(f'sub{i}', '')
+            desc = data.get(f'ref{i}', 0)
+            amt = data.get(f'amt{i}', 0)
+            bill_no = data.get(f'bill{i}', 0)
+            
+            
+            
+
+            account_num=data.get(f'dropdown{i}', 0)  # Default to 0 if not present or invalid
+            print(account_num)
+            
+            try:
+                    # Fetch the corresponding Category, Subcategory, and IndividualAccount instances
+                
+                cre_account = Ledger.objects.get(ledger_number=account_num)  # Replace with the appropriate field
+                cre_subcategory = cre_account.group
+                cre_category = cre_account.group.primary_group
+                print(voucher_no)
+                
+                # Create and save the JournalEntries instance
+                entry = PurchaseReceipt(
+                    date=invoicedate,
+                    voucherNo=voucher_no.split('-')[-1],
+                    voucherCode=voucher_no,
+                    deb_primary_group=deb_category,
+                    deb_group=deb_subcategory,
+                    deb_ledger=deb_account,
+                    cred_primary_group=cre_category,
+                    cred_group=cre_subcategory,
+                    cred_ledger=cre_account,
+                    description=desc,
+                    amount=float(amt),
+                    total=float(total),
+                    bill_no=bill_no
+                    
+                        # You can set comments as needed
+                )
+                entry.save()
+            except Primary_Group.DoesNotExist:
+                pass
+            except Group.DoesNotExist:
+                pass
+            except Ledger.DoesNotExist:
+                pass
+        entry_response = {
+                    "voucherNo": entry.voucherNo,
+                    "voucherCode": entry.voucherCode,  # Assuming you have a 'voucherCode' field in your model
+                    "account": entry.deb_ledger.ledger_name,  # Assuming 'account_name' is the relevant field in 'IndividualAccount'
+                }
+
+        return JsonResponse({'success': True, 'message': 'Sucess'})            
+    except Exception as e:
+        print(e)
+        return JsonResponse({'success': False, 'message': 'Invalid request'})
+        
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+
   
   
     

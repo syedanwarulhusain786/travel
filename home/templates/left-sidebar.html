@@ -99,10 +99,10 @@
                           <a href="{% url 'maintain' %}">SALES-ORDER VOUCHER LIST</a>
                         </li>  
                         <li>
-                            <a href="{% url 'maintain' %}">SALES VOUCHER</a>
+                            <a href="{% url 'salesEntry' %}">SALES VOUCHER</a>
                         </li>
                         <li>
-                            <a href="{% url 'maintain' %}">SALES VOUCHER LIST</a>
+                            <a href="{% url 'salesList' %}">SALES VOUCHER LIST</a>
                         </li>
                         <li>
                           <a href="{% url 'maintain' %}">SALES-RETURN VOUCHER</a>
@@ -115,7 +115,25 @@
                       </ul>
                     </li>
                 
-
+                    <li  class="has-sub" >
+                      <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#buttonsp"
+                        aria-expanded="false" aria-controls="buttons1">
+                        <span class="nav-text">PURCHASE</span> <b class="caret"></b>
+                      </a>
+                      <ul  class="collapse"  id="buttonsp">
+                        <div class="sub-menu">
+                          
+                        <li>
+                          <a href="{% url 'purchaseEntry' %}">PURCHASE VOUCHER</a>
+                        </li>
+                        <li>
+                          <a href="{% url 'purchaseList' %}">PURCHASE VOUCHER LIST</a>
+                        </li>  
+                        
+                          
+                        </div>
+                      </ul>
+                    </li>
                 
                 
         
