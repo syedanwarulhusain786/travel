@@ -80,30 +80,21 @@
                     <div class="form-group text-center">
                         <div class="row" style="margin-left: 155px; left: 40px;">
                             <label for="journal_date"> Invoice Date <span class="text-danger">&emsp;</span></label>
-                            <input type="date" class="form-control col-5" id="invoice_date" style="
-                            left: 40px;
-                        ">
+                            <input type="date" class="form-control col-5" id="invoice_date" style="left: 40px;">
                         </div>
                     </div>
 
 
 
                     <div class="form-group text-center">
-                        <div class="row" style="
-                        margin-left: 252px;
-                        padding-left: 0px;
-                    ">
-                            <label for="notes">Notes &emsp;</label>
+                        <div class="row" style="margin-left: 252px;padding-left: 0px;">
+                            <label for="notes">Narration &emsp;</label>
                             <textarea class="form-control col-6" id="notes" rows="3" placeholder="Write something here..."></textarea>
                             
                         </div>
                     </div>
             </div>
-            <div class="form-group text-center my-5">
-                <div class="col-md-12 text-right"> <!-- Add Bootstrap grid classes -->
-                    <button type="button" class="btn btn-danger" id="addRowButton">Add Row</button>
-                </div>
-            </div>
+            
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered" id="transactionTable">
@@ -112,7 +103,6 @@
                                 <th>Account</th>
                                 <th>Primary Group</th>
                                 <th>Group</th>
-                                <th>Narration</th>
                                 <th>Debit</th>
                                 <th>Credit</th>
                             </tr>
@@ -167,7 +157,11 @@
                             </tr>
                             <tr>
                                 <td>
-                                    
+                                    <div class="form-group text-center my-5">
+                                        <div class="col-md-12 text-right"> <!-- Add Bootstrap grid classes -->
+                                            <button type="button" class="btn btn-danger" id="addRowButton">Add Row</button>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     
@@ -270,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </script> 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
     // ...
 
     // Get a reference to the "Add Row" button
@@ -279,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Function to add a new row to the table
     function addNewRow() {
         const table = document.getElementById("transactionTable");
-        const newRow = table.insertRow(table.rows.length-1); // Insert before the last row
+        const newRow = table.insertRow(table.rows.length - 1); // Insert before the last row
 
         // Clone the cells from an existing row (you can choose any row as a template)
         const templateRow = table.rows[1]; // Assuming the second row (index 1) is your template
@@ -288,24 +282,51 @@ document.addEventListener("DOMContentLoaded", function() {
             newCell.innerHTML = templateRow.cells[i].innerHTML;
         }
 
+        // Add a "Remove" button to the new row
+        const removeCell = newRow.insertCell(templateRow.cells.length);
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.classList.add("btn", "btn-danger", "remove-row-button");
+        removeButton.textContent = "Remove";
+        removeCell.appendChild(removeButton);
+
+        // Attach a click event listener to the "Remove" button
+        removeButton.addEventListener("click", function () {
+            table.deleteRow(newRow.rowIndex);
+            updateRowIds(); // Update the IDs after removing a row
+        });
+
         // Update the IDs of the cloned elements to avoid duplicates
         const rowIndex = table.rows.length - 2; // Index of the new row (0-based)
-        console.log(rowIndex)
         const elementsToChange = newRow.querySelectorAll("[id]");
         elementsToChange.forEach(function (element) {
             const id = element.getAttribute("id");
             const idParts = id.split(/\d+/);
-            const num = rowIndex ; // Adding 1 to match the row number
+            const num = rowIndex; // Adding 1 to match the row number
             element.setAttribute("id", idParts[0] + num);
             element.setAttribute("name", idParts[0] + num); // Also update the 'name' attribute if needed
             // element.value = ""; // Clear the input values in the new row
         });
-
-        
     }
 
     // Add a click event listener to the "Add Row" button
     addRowButton.addEventListener("click", addNewRow);
+
+    // Function to update the IDs of all rows after removing a row
+    function updateRowIds() {
+        const table = document.getElementById("transactionTable");
+        for (let i = 1; i < table.rows.length - 1; i++) {
+            const row = table.rows[i];
+            const elementsToUpdate = row.querySelectorAll("[id]");
+            elementsToUpdate.forEach(function (element) {
+                const id = element.getAttribute("id");
+                const idParts = id.split(/\d+/);
+                const num = i - 1; // Subtract 1 to match the row number
+                element.setAttribute("id", idParts[0] + num);
+                element.setAttribute("name", idParts[0] + num); // Also update the 'name' attribute if needed
+            });
+        }
+    }
 });
 
 </script>

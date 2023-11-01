@@ -153,8 +153,10 @@ def submit_journal(request):
         data = request.POST # Replace with your actual QueryDict data
         voucher_no = data.get(f'voucher', '').split('-')[-1]
         invoice_no = data.get(f'invoice_no', '').split('-')[-1]
-        invoice_date = data.get(f'invoice_date', '').split('-')[-1]
-        
+        invoice_date = data.get(f'invoice_date','')
+        if not invoice_date:
+            invoice_date=None
+        print(invoice_date)
         
         narration = data.get(f'notes', '')  # Replace 'nar' with the actual key in your QueryDict
         
@@ -164,6 +166,9 @@ def submit_journal(request):
             # narration = data.get(f'nar{i}', '')  # Replace 'nar' with the actual key in your QueryDict
             category_name = data.get(f'cat{i}', '')
             subcategory_name = data.get(f'sub{i}', '')
+            print(category_name)
+            print(subcategory_name)
+            
             debit = data.get(f'deb{i}', 0)
             if debit=='':
                 debit=0.0# Default to 0 if not present or invalid
@@ -176,7 +181,7 @@ def submit_journal(request):
                 category = Primary_Group.objects.get(primary_group_name=category_name)
                 subcategory = Group.objects.get(group_name=subcategory_name.split('-')[-1])
                 account = Ledger.objects.get(ledger_number=account_num)  # Replace with the appropriate field
-            
+
                 # Create and save the JournalEntries instance
                 entry = JournalEntries(
                     voucherNo=voucher_no,
