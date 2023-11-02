@@ -166,8 +166,7 @@ def submit_journal(request):
             # narration = data.get(f'nar{i}', '')  # Replace 'nar' with the actual key in your QueryDict
             category_name = data.get(f'cat{i}', '')
             subcategory_name = data.get(f'sub{i}', '')
-            print(category_name)
-            print(subcategory_name)
+
             
             debit = data.get(f'deb{i}', 0)
             if debit=='':
@@ -572,6 +571,8 @@ def recieptList(request):
     })
     
     
+    
+    
 def salesEntry(request):
     Category_list=Primary_Group.objects.all()
     Subcategory_list = Group.objects.all()
@@ -582,6 +583,7 @@ def salesEntry(request):
         'username':request.user,'Category_list':Category_list,'Subcategory_list':Subcategory_list,'account_list':accounts,'currency':currency,'debit':debit,
     })  
 def submitSales(request):
+    tax_per=10
     Category_list=Primary_Group.objects.all()
     Subcategory_list = Group.objects.all()
     debit = Ledger.objects.filter(group__group_name__in=["Sales"])
@@ -595,7 +597,8 @@ def submitSales(request):
     invoicedate = data.get(f'invoice_date', '')
     debit_led = data.get(f'debit_led', '')
     total = data.get(f'd_total', '')
-    
+    taxed=(10/100)*float(total)
+    final=float(total)+taxed
     deb_category = Primary_Group.objects.get(primary_group_name='INCOME')
     deb_subcategory = Group.objects.get(group_name='Sales')
     deb_account = Ledger.objects.get(ledger_name=debit_led.split('-')[-1])  # Replace with the appropriate field
@@ -610,12 +613,15 @@ def submitSales(request):
             category_name = data.get(f'cat{i}', '')
             subcategory_name = data.get(f'sub{i}', '')
             desc = data.get(f'ref{i}', 0)
+            qty = data.get(f'qty{i}', 0)
+            
+            unt = data.get(f'unt{i}', 0)
+            
             amt = data.get(f'amt{i}', 0)
             
             
 
             account_num=data.get(f'dropdown{i}', 0)  # Default to 0 if not present or invalid
-            print(account_num)
             
             try:
                     # Fetch the corresponding Category, Subcategory, and IndividualAccount instances
@@ -623,7 +629,6 @@ def submitSales(request):
                 cre_account = Ledger.objects.get(ledger_number=account_num)  # Replace with the appropriate field
                 cre_subcategory = cre_account.group
                 cre_category = cre_account.group.primary_group
-                print(voucher_no)
                 
                 # Create and save the JournalEntries instance
                 entry = SalesReceipt(
@@ -637,8 +642,12 @@ def submitSales(request):
                     cred_group=cre_subcategory,
                     cred_ledger=cre_account,
                     decsription=desc,
+                    qty=int(qty),
+                    untPrice=int(unt),
                     amount=float(amt),
                     total=float(total),
+                    taxed=float(taxed),
+                    final=float(final),
                     
                     
                         # You can set comments as needed
@@ -659,29 +668,70 @@ def submitSales(request):
         return JsonResponse({'success': True, 'message': 'Sucess'})            
     except Exception as e:
         print(e)
-        return JsonResponse({'success': False, 'message': 'Invalid request'})
-        
-    
-    
-    
-    
-    
-    
-    
+        return JsonResponse({'success': False, 'message': 'Invalid request'}) 
+from django.db.models import F
 
-    
+from django.db.models import Subquery, OuterRef
 def salesList(request):
+    unique_receipts = SalesReceipt.objects.filter(
+    s_no=Subquery(
+        SalesReceipt.objects.filter(voucherCode=OuterRef('voucherCode')).order_by('s_no').values('s_no')[:1]
+    )
+)
+    # Sale_Receipt=SalesReceipt.objects.all()
     Category_list=Primary_Group.objects.all()
     Subcategory_list = Group.objects.all()
     banks = Ledger.objects.filter(group__group_name__in=["Bank Account"])
     cash= Ledger.objects.filter(group__group_name__in=["Cash"])
     accounts = Ledger.objects.exclude(group__group_name__in=["Cash", "Bank Account"])
     currency=[{'key':cur,'value':cur+'-'+currency_symbols[cur]} for cur in currency_symbols]
-    print(currency)
-    return render(request, 'recieptVoucher.html', context={
+    print(unique_receipts)
+    return render(request, 'sales_List.html', context={
         'username':request.user,'Category_list':Category_list,'Subcategory_list':Subcategory_list,'account_list':accounts,'currency':currency,'banks':banks,
-        'cashs':cash
+        'cashs':cash,'SalesReceipt':unique_receipts
     })  
+  
+  
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.http import FileResponse
+  
+  
+def generate_pdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = "inline; filename=your_file.pdf"
+
+    p = canvas.Canvas(response, pagesize=letter)
+    p.drawString(100, 750, "Hello, world.")
+    # Add more content here using the ReportLab API.
+
+    p.showPage()
+    p.save()
+
+    return response
+  
+
+
+def item_detail(request, voucher_id):
+    print(voucher_id)
+    Sale_Receipt=SalesReceipt.objects.filter(voucherCode=voucher_id)
+    print(Sale_Receipt)
+    # item = get_object_or_404(Item, id=item_id)  # Retrieve the item based on its ID
+    return render(request, 'salesvoucher_pdf.html', {'item': Sale_Receipt[0],'items': Sale_Receipt,})
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
 def purchaseEntry(request):

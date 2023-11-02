@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to add a new row to the table
     function addNewRow() {
         const table = document.getElementById("transactionTable");
-        const newRow = table.insertRow(table.rows.length - 1); // Insert before the last row
+        const newRow = table.insertRow(table.rows.length - 3); // Insert before the last row
 
         // Clone the cells from an existing row (you can choose any row as a template)
         const templateRow = table.rows[1]; // Assuming the second row (index 1) is your template
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // Update the IDs of the cloned elements to avoid duplicates
-        const rowIndex = table.rows.length - 2; // Index of the new row (0-based)
+        const rowIndex = table.rows.length - 4; // Index of the new row (0-based)
         const elementsToChange = newRow.querySelectorAll("[id]");
         elementsToChange.forEach(function (element) {
             const id = element.getAttribute("id");
@@ -138,23 +138,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         tableRows.forEach((row, index) => {
-            const select = row.querySelector("select");
+            try{
+                const select = row.querySelector("select");
+                console.log(select)
+
+                const cat = row.querySelector(`#cat${index + 1}`);
+                const sub = row.querySelector(`#sub${index + 1}`);
+                const ref = row.querySelector(`#ref${index + 1}`);
+                const amt = row.querySelector(`#amt${index + 1}`);
+                console.log(index)
+                // Append each field to the FormData object
+                formData.append(`dropdown${index + 1}`, select.value);
 
 
-            const cat = row.querySelector(`#cat${index + 1}`);
-            const sub = row.querySelector(`#sub${index + 1}`);
-            const ref = row.querySelector(`#ref${index + 1}`);
-            const amt = row.querySelector(`#amt${index + 1}`);
-            console.log(index)
-            // Append each field to the FormData object
-            formData.append(`dropdown${index + 1}`, select.value);
 
-
-
-            formData.append(`cat${index + 1}`, cat.value);
-            formData.append(`sub${index + 1}`, sub.value);
-            formData.append(`ref${index + 1}`, ref.value);
-            formData.append(`amt${index + 1}`, amt.value);
+                formData.append(`cat${index + 1}`, cat.value);
+                formData.append(`sub${index + 1}`, sub.value);
+                formData.append(`ref${index + 1}`, ref.value);
+                formData.append(`amt${index + 1}`, amt.value);
+            }catch{
+                
+            }
         });
 
         // Make an AJAX POST request
@@ -194,7 +198,7 @@ clearFormButton.addEventListener("click", function () {
         const sub = row.querySelector(`#sub${index + 1}`);
 
         const amt = row.querySelector(`#amt${index + 1}`);
-        const cre = row.querySelector(`#cre${index + 1}`);
+        // const cre = row.querySelector(`#cre${index + 1}`);
 
         // Clear the form fields
         select.value = ''; // Clear the select value
@@ -202,7 +206,7 @@ clearFormButton.addEventListener("click", function () {
         ref.value = ''; // Clear the sub input value
         sub.value = ''; // Clear the nar input value
         amt.value = ''; // Clear the cre input value
-        cre.value = ''; // Clear the deb input value
+        // cre.value = ''; // Clear the deb input value
     });
 });
 // Update the modal content with data
@@ -273,13 +277,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // Log the totals to the console
-        var bankAmt_in_No = document.getElementById('bankAmt_in_No');
 
     
         const total_deb = document.getElementById("d_total");
-        const total_cred = document.getElementById("c_total");
+        const total_tax = document.getElementById("d_tax");
+        const final = document.getElementById("final");
+        var tax = 0.1  * debTotal
         total_deb.value = debTotal.toFixed(2)
-        total_cred.value = creTotal.toFixed(2)
+        total_tax.value = tax.toFixed(2)
+        // var final_amt=(debTotal.toFixed(2))+tax
+        var amount = parseFloat(total_deb.value) || 0;
+        var total = amount + tax;
+        final.value = total.toFixed(2);
+ 
+
 
         // Set the total values in the corresponding input fields
 

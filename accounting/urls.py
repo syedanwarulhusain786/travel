@@ -56,7 +56,7 @@ urlpatterns = [
     
     
     
-    
-    
+    path('view_salesvoucher/<str:voucher_id>/', views.item_detail, name='item_detail'),
+    path('generate_pdf/', views.generate_pdf, name='generate_pdf'),
     
 ]

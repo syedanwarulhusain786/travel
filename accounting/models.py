@@ -217,8 +217,15 @@ class SalesReceipt(models.Model):
     cred_ledger = models.ForeignKey(Ledger, on_delete=models.CASCADE, related_name='credit_ledger_salesreceipts')
     cred_primary_group = models.ForeignKey(Primary_Group, on_delete=models.CASCADE, related_name='credit_primary_group_salesreceipts')
     decsription=models.CharField(max_length=400)
+    qty = models.IntegerField()
+    untPrice = models.DecimalField(max_digits=10, decimal_places=2)
+    
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    taxed = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    final = models.DecimalField(max_digits=10, decimal_places=2)
+    
 
     def save(self, *args, **kwargs):
         if not self.voucherNo:

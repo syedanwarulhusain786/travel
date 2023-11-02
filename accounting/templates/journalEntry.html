@@ -357,7 +357,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const cat = row.querySelector(`#cat${index + 1}`);
             const sub = row.querySelector(`#sub${index + 1}`);
-            const nar = row.querySelector(`#nar${index + 1}`);
             const cre = row.querySelector(`#cre${index + 1}`);
             const deb = row.querySelector(`#deb${index + 1}`);
             console.log( index)
@@ -368,7 +367,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             formData.append(`cat${index + 1}`, cat.value);
             formData.append(`sub${index + 1}`, sub.value);
-            formData.append(`nar${index + 1}`, nar.value);
             formData.append(`cre${index + 1}`, cre.value);
             formData.append(`deb${index + 1}`, deb.value);
         });

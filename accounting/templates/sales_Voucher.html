@@ -133,6 +133,9 @@
                                             <th>Primary Group</th>
                                             <th>Group</th>
                                             <th>Description</th>
+                                            <th>Quantity</th>
+                                            <th>Unit Price</th>
+
                                             <th>Amount</th>
                                             <th>Remove</th>
 
@@ -165,10 +168,66 @@
                                             </td>
 
                                             <td><input type="text" class="form-control" id="ref1"></td>
-                                            <td><input type="number" class="form-control" step="0.01" id="amt1"></td>
+                                            <td><input type="text" class="form-control" id="qty1" value=1></td>
+                                            <td><input type="text" class="form-control" id="unt1" ></td>
+
+
+                                            <td><input type="number" class="form-control" step="0.01" id="amt1" ></td>
 
 
                                         </tr>
+
+                                        <tr>
+                                            <td>
+
+                                          
+                                            </td>
+                                            <td>
+
+
+                                            </td>
+                                            <td>
+                                                
+
+                                            </td>
+                                            <td></td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <span><b>Sub Total:</b></span>
+                                            </td>
+                                            <!-- <td><input type="number" class="form-control" step="0.01" id="c_total"
+                                                    disabled>
+                                            </td> -->
+                                            <td><input type="number" class="form-control" step="0.01" id="d_total"
+                                                ></td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+
+                                            </td>
+                                            <td>
+
+
+                                            </td>
+                                            <td>
+                                                <span><b></b></span>
+
+                                            </td>
+                                            <td></td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                                Tax (10%)
+                                            </td>
+                                            <!-- <td><input type="number" class="form-control" step="0.01" id="c_total"
+                                                    disabled>
+                                            </td> -->
+                                            <td><input type="number" class="form-control" step="0.01" id="d_tax"
+                                                ></td>
+                                        </tr>
+
 
                                         <tr>
                                             <td>
@@ -181,18 +240,20 @@
 
                                             </td>
                                             <td>
-
+                                                <span><b></b></span>
 
                                             </td>
-                                            <td><span><b>Total:</b></span></td>
-                                            <td><input type="number" class="form-control" step="0.01" id="d_total"
-                                                    disabled>
+                                            <td></td>
+                                            <td>
                                             </td>
-
+                                            <td>
+                                                Grand Total :
+                                            </td>
                                             <!-- <td><input type="number" class="form-control" step="0.01" id="c_total"
                                                     disabled>
                                             </td> -->
-                                            <td></td>
+                                            <td><input type="number" class="form-control" step="0.01" id="final"
+                                                ></td>
                                         </tr>
 
                                     </tbody>
@@ -243,7 +304,31 @@
         </div>
     </div>
 </div>
+<script>
+    // Add event listeners to each row's "Quantity" and "Unit Price" fields
+    document.addEventListener('DOMContentLoaded', function() {
+        var table = document.querySelector('table');
 
+        table.addEventListener('input', function (event) {
+            var target = event.target;
+            if (target.tagName === 'INPUT' && target.id.startsWith('qty') || target.id.startsWith('unt')) {
+                updateAmount(target);
+            }
+        });
+
+        function updateAmount(input) {
+            var row = input.closest('tr');
+            var qtyInput = row.querySelector('input[id^="qty"]');
+            var untInput = row.querySelector('input[id^="unt"]');
+            var amtInput = row.querySelector('input[id^="amt"]');
+
+            var quantity = parseFloat(qtyInput.value) || 0;
+            var unitPrice = parseFloat(untInput.value) || 0;
+            var amount = quantity * unitPrice;
+            amtInput.value = amount.toFixed(2);
+        }
+    });
+</script>
 <script src="{% static '\home\js\sales.js' %}"></script>
 
 {% endblock %}

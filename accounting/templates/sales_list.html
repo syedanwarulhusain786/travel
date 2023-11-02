@@ -9,7 +9,7 @@
             <div class="card">
                 <div class="card-header text-Center">
                 
-                    <h1>{{heading}}<span class="badge badge-primary badge-pill">Payment List</span></h1>
+                    <h1>{{heading}}<span class="badge badge-primary badge-pill">Sales List</span></h1>
                     <!-- Expand Left -->
                 </div>
                 
@@ -17,46 +17,49 @@
                 <div class="card-body">
                     <!-- Breadcrumb light -->
             
-                    <table class="table table-striped">
+                    <table id="productsTable" class="table table-hover table-product" style="width:100%">
                         <thead>
                           <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Account</th>
-                            <th scope="col">Sum Of Debit</th>
-                            <th scope="col">Sum Of Credit</th>
-                            <th scope="col">Sum Of Balance</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Voucher</th>
+                            <th scope="col">VoucherCode</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">View</th>
+
 
 
                           </tr>
                         </thead>
+                        
                         <tbody>
-                            {% for row in data %}
+                          {% for receipt in SalesReceipt %}
                           <tr>
-                            <td scope="row">{{ forloop.counter }}</td>
-                            <td>{{row.type}}</td>
-                            <td>{{row.deb}}</td>
-                            <td>{{row.cred}}</td>
+                            <td class="py-0">
+                              {{receipt.s_no}}
+                            </td>
+                            <td>{{receipt.date}}</td>
+                            <td>{{receipt.voucherNo}}</td>
+
+                            <td>{{receipt.voucherCode}}</td>
+                            <td>{{receipt.decsription}}</td>
+                            <td>{{receipt.amount}}</td>
+                            <td>{{receipt.total}}</td>
+                            <td><a href="{% url 'item_detail' receipt.voucherCode %}" target="_blank" class="btn btn-danger"> View Reciept</a></td>
+
                             
-                            <td>{% if row.bal < 0 %}
-                                ({{ row.bal }})
-                            {% else %}
-                                {{ row.bal }}
-                            {% endif %}</td>
-
-
-
-                            
+                       
                           </tr>
-                          {%  endfor %}
-                          <tr class="table-dark">
-                            <td scope="row">Grand Total</td>
-                            <td></td>
-                            <td>{{result.deb_result}}</td>
-                            <td>{{result.cred_result}}</td>
-                            <td>{{result.bal_result}}</td>
-                            
-                          </tr>
-                          
+            
+                          {% endfor %}
+            
+            
+            
+            
+            
+            
                         </tbody>
                       </table>
                       
